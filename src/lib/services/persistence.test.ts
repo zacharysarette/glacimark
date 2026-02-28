@@ -6,6 +6,8 @@ import {
   getDocsFolder,
   saveSortMode,
   getSortMode,
+  saveLayoutMode,
+  getLayoutMode,
 } from "./persistence";
 
 const STORAGE_KEY = "planning-central:last-selected-path";
@@ -80,5 +82,18 @@ describe("saveSortMode / getSortMode", () => {
 
   it("returns 'name-asc' as the default when nothing stored", () => {
     expect(getSortMode()).toBe("name-asc");
+  });
+});
+
+const LAYOUT_MODE_KEY = "planning-central:layout-mode";
+
+describe("saveLayoutMode / getLayoutMode", () => {
+  it("round-trips a layout mode value", () => {
+    saveLayoutMode("columns");
+    expect(getLayoutMode()).toBe("columns");
+  });
+
+  it("returns 'centered' as the default when nothing stored", () => {
+    expect(getLayoutMode()).toBe("centered");
   });
 });

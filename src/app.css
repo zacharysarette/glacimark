@@ -198,3 +198,30 @@ html, body, #app {
 .markdown-body pre.mermaid svg {
   max-width: 100%;
 }
+
+/* Svgbob diagram styling — dark theme colors applied in Rust backend */
+.markdown-body pre.bob-rendered {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.markdown-body pre.bob-rendered svg {
+  display: block;
+  min-width: min-content;
+}
+
+/* Unrendered bob blocks (before SVG replacement) */
+.markdown-body pre.bob {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", monospace;
+  font-size: 0.85em;
+  color: var(--text-secondary);
+}

@@ -18,16 +18,19 @@
     getDocsFolder,
     saveSortMode,
     getSortMode,
+    saveLayoutMode,
+    getLayoutMode,
   } from "./lib/services/persistence";
   import { findFirstFile, filterEntries } from "./lib/services/tree-utils";
   import { sortEntries, type SortMode } from "./lib/services/sort";
-  import type { FileEntry } from "./lib/types";
+  import type { FileEntry, LayoutMode } from "./lib/types";
 
   let rawTree: FileEntry[] = $state([]);
   let selectedPath = $state("");
   let fileContent = $state("");
   let docsPath = $state("");
   let sortMode: SortMode = $state(getSortMode());
+  let layoutMode: LayoutMode = $state(getLayoutMode());
   let filterQuery = $state("");
 
   let sortedTree: FileEntry[] = $derived(sortEntries(rawTree, sortMode));
@@ -105,6 +108,11 @@
     saveSortMode(sortMode);
   }
 
+  function handleLayoutChange(mode: LayoutMode) {
+    layoutMode = mode;
+    saveLayoutMode(mode);
+  }
+
   async function handleHelp() {
     try {
       fileContent = await getHelpContent();
@@ -177,7 +185,7 @@
 
 <div class="app-layout">
   <Sidebar entries={tree} {selectedPath} onselect={handleSelect} onchangefolder={handleChangeFolder} {sortMode} onsortchange={handleSortChange} onhelp={handleHelp} {filterQuery} onfilterchange={handleFilterChange} />
-  <MarkdownViewer content={fileContent} filePath={selectedPath} />
+  <MarkdownViewer content={fileContent} filePath={selectedPath} {layoutMode} onlayoutchange={handleLayoutChange} />
 </div>
 
 <style>

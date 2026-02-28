@@ -578,7 +578,40 @@ npx vitest run && npx svelte-check && npx tauri build
 
 ---
 
+## Feature: ASCII Art Diagram Rendering (svgbob)
+
+### Status: DONE
+
+### Problem
+ASCII art diagrams in markdown (file trees, box layouts, tables) render as plain monospace text. They look okay for editing but could be much more visually polished.
+
+### Solution
+Integrated **svgbob** (Rust crate, 4.1k stars) to convert ASCII art into clean SVGs. Since we already have a Rust backend, the integration is native — no WASM needed.
+
+### How It Works
+- Code blocks tagged with `bob`, `svgbob`, or `ascii-diagram` are detected by the marked.js renderer
+- Content is sent to the Rust backend via `render_ascii_diagram` Tauri command
+- svgbob converts ASCII to SVG; a pre-processor converts Unicode box-drawing characters (`├ └ ┌ ─ │`) to svgbob equivalents (`+ - |`)
+- SVGs are injected into the DOM, styled for dark theme
+
+### Files Changed
+- `src-tauri/Cargo.toml` — added `svgbob = "0.7"`
+- `src-tauri/src/commands/diagram.rs` — NEW: `normalize_box_drawing()` + `render_ascii_diagram` command
+- `src-tauri/src/commands/mod.rs` — registered diagram module
+- `src-tauri/src/lib.rs` — registered command
+- `src/lib/services/filesystem.ts` — added `renderAsciiDiagram()` invoke
+- `src/lib/services/markdown.ts` — bob code block detection + `renderBobDiagrams()`
+- `src/lib/components/MarkdownViewer.svelte` — calls `renderBobDiagrams()` after DOM update
+- `src/app.css` — dark theme styling for rendered SVGs
+
+### Research Notes
+Other libraries considered: typograms (archived), markdeep (monolithic), ditaa (Java-only), goat (Go-only). svgbob was the clear winner for a Tauri/Rust stack.
+
+---
+
 ## Feature: Widescreen Reading Layout
+
+### Status: DONE
 
 ### Problem
 On widescreen/ultrawide monitors, the markdown content stretches across the full width of the viewport. The `.markdown-body` has no `max-width` and the app grid is `280px 1fr`, so text lines can be 200+ characters wide — far beyond the ~80 character comfort zone for reading. There's massive wasted horizontal space.

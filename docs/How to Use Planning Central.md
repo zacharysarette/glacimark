@@ -46,6 +46,19 @@ Click the **?** button to open this guide at any time, no matter what folder you
 
 ---
 
+## Reading Layout
+
+The markdown viewer has two reading layout modes, toggled with buttons in the top-right corner of the content area:
+
+| Button | Mode | Description |
+|---|---|---|
+| **≡** | **Single Column** (default) | Content capped at 800px wide, centered. Best for comfortable reading. |
+| **⊞** | **Multi-Column** | Content flows into newspaper-style columns. Great for widescreen/ultrawide monitors. |
+
+Your chosen layout is remembered across sessions.
+
+---
+
 ## Viewing Markdown
 
 The main content area renders your markdown with full formatting support:
@@ -54,6 +67,22 @@ The main content area renders your markdown with full formatting support:
 - **Code blocks** — syntax highlighted with highlight.js
 - **Links** — clickable
 - **Mermaid diagrams** — rendered as live SVG diagrams
+
+### ASCII Art Diagrams (svgbob)
+
+Fenced code blocks tagged with `bob`, `svgbob`, or `ascii-diagram` are rendered as clean SVG graphics using svgbob. This works great for file trees, box layouts, and other ASCII art:
+
+~~~
+```bob
++--+--+
+|  |  |
++--+--+
+```
+~~~
+
+**Auto-detection:** Unlabeled code blocks that contain Unicode box-drawing characters (`┌ ┐ └ ─ │ ├ →` etc.) are automatically rendered as SVG diagrams — no tag needed. This means existing markdown with ASCII art layouts or file trees just works.
+
+Unicode box-drawing characters (`├`, `└`, `─`, `│`, etc.) are automatically converted to svgbob-compatible equivalents before rendering.
 
 ### Mermaid Diagrams
 
@@ -88,6 +117,6 @@ Planning Central watches your folder for changes in real time. If you edit a mar
 
 ## Tips
 
-- **Widescreen monitors:** Content currently stretches to fill the available width. A reading layout feature is planned.
+- **Widescreen monitors:** Use the layout toggle (top-right of the content area) to switch between centered and multi-column modes.
 - **Multiple folders:** Use the folder button to switch between different documentation directories. Each folder's state is independent.
 - **Dogfooding:** Planning Central's own documentation lives in the `docs/` folder — you're reading it right now!

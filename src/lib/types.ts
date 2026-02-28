@@ -5,3 +5,5 @@ export interface FileEntry {
   children: FileEntry[];
   modified?: number;
 }
+
+export type LayoutMode = "centered" | "columns";

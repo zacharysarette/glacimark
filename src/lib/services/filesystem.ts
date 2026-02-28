@@ -22,6 +22,10 @@ export async function getHelpContent(): Promise<string> {
   return invoke<string>("get_help_content");
 }
 
+export async function renderAsciiDiagram(input: string): Promise<string> {
+  return invoke<string>("render_ascii_diagram", { input });
+}
+
 export async function pickFolder(): Promise<string | null> {
   const selected = await open({
     directory: true,
