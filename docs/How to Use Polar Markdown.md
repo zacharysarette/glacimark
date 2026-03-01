@@ -1,6 +1,6 @@
-# How to Use Planning Central
+# How to Use Polar Markdown
 
-Planning Central is a desktop markdown viewer with Mermaid diagram support. It lets you browse, read, and navigate markdown files with live-rendered diagrams.
+Polar Markdown is a desktop markdown viewer with Mermaid diagram support. It lets you browse, read, and navigate markdown files with live-rendered diagrams.
 
 ---
 
@@ -124,7 +124,7 @@ Supported diagram types include flowcharts, sequence diagrams, class diagrams, s
 
 ## Editing Markdown
 
-Planning Central includes a built-in split-pane editor so you can edit files without leaving the app.
+Polar Markdown includes a built-in split-pane editor so you can edit files without leaving the app.
 
 ### Entering Edit Mode
 
@@ -162,7 +162,7 @@ Each pane toggles independently. You can have one pane in edit mode and another 
 
 ## Live File Watching
 
-Planning Central watches your folder for changes in real time. If you edit a markdown file in another editor (or if a tool like Claude Code writes files), the sidebar and content area update automatically — no refresh needed.
+Polar Markdown watches your folder for changes in real time. If you edit a markdown file in another editor (or if a tool like Claude Code writes files), the sidebar and content area update automatically — no refresh needed.
 
 ---
 
@@ -185,4 +185,4 @@ Planning Central watches your folder for changes in real time. If you edit a mar
 
 - **Widescreen monitors:** Use the layout toggle (top-right of the content area) to switch between centered and multi-column modes.
 - **Multiple folders:** Use the folder button to switch between different documentation directories. Each folder's state is independent.
-- **Dogfooding:** Planning Central's own documentation lives in the `docs/` folder — you're reading it right now!
+- **Dogfooding:** Polar Markdown's own documentation lives in the `docs/` folder — you're reading it right now!

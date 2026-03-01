@@ -5,7 +5,7 @@ use std::time::UNIX_EPOCH;
 use walkdir::WalkDir;
 
 /// Help file content embedded at compile time — always available regardless of install location.
-const HELP_CONTENT: &str = include_str!("../../../docs/How to Use Planning Central.md");
+const HELP_CONTENT: &str = include_str!("../../../docs/How to Use Polar Markdown.md");
 
 /// Recursively reads a directory tree, filtering to .md files and directories
 /// that contain .md files. Skips hidden directories.

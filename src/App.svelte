@@ -288,13 +288,13 @@
       const content = await getHelpContent();
       if (panes.length === 0) {
         const id = createPaneId();
-        panes = [{ id, path: "How to Use Planning Central.md", content, readOnly: true, editMode: false }];
+        panes = [{ id, path: "How to Use Polar Markdown.md", content, readOnly: true, editMode: false }];
         activePaneId = id;
         savedPaneBeforeHelp = null;
       } else {
         panes = panes.map((p) =>
           p.id === activePaneId
-            ? { ...p, path: "How to Use Planning Central.md", content, readOnly: true, editMode: false }
+            ? { ...p, path: "How to Use Polar Markdown.md", content, readOnly: true, editMode: false }
             : p
         );
       }

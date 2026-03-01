@@ -376,7 +376,7 @@
   {:else}
     <div class="empty-state">
       <div class="empty-icon">📝</div>
-      <h2>Planning Central</h2>
+      <h2>Polar Markdown</h2>
       <p>Select a markdown file from the sidebar to view it.</p>
     </div>
   {/if}

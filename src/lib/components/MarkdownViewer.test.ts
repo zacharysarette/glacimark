@@ -23,7 +23,7 @@ describe("MarkdownViewer", () => {
       props: { content: "", filePath: "" },
     });
 
-    expect(screen.getByText("Planning Central")).toBeInTheDocument();
+    expect(screen.getByText("Polar Markdown")).toBeInTheDocument();
     expect(
       screen.getByText("Select a markdown file from the sidebar to view it.")
     ).toBeInTheDocument();

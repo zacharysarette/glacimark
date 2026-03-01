@@ -12,7 +12,7 @@ import {
   getOpenPanes,
 } from "./persistence";
 
-const STORAGE_KEY = "planning-central:last-selected-path";
+const STORAGE_KEY = "polar-markdown:last-selected-path";
 
 beforeEach(() => {
   localStorage.clear();
@@ -45,7 +45,7 @@ describe("getLastSelectedPath", () => {
   });
 });
 
-const DOCS_FOLDER_KEY = "planning-central:docs-folder";
+const DOCS_FOLDER_KEY = "polar-markdown:docs-folder";
 
 describe("saveDocsFolder", () => {
   it("saves the folder path to localStorage", () => {
@@ -74,7 +74,7 @@ describe("getDocsFolder", () => {
   });
 });
 
-const SORT_MODE_KEY = "planning-central:sort-mode";
+const SORT_MODE_KEY = "polar-markdown:sort-mode";
 
 describe("saveSortMode / getSortMode", () => {
   it("round-trips a sort mode value", () => {
@@ -87,7 +87,7 @@ describe("saveSortMode / getSortMode", () => {
   });
 });
 
-const LAYOUT_MODE_KEY = "planning-central:layout-mode";
+const LAYOUT_MODE_KEY = "polar-markdown:layout-mode";
 
 describe("saveLayoutMode / getLayoutMode", () => {
   it("round-trips a layout mode value", () => {

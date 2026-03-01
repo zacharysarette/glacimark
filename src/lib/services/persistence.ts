@@ -1,11 +1,11 @@
 import type { SortMode } from "./sort";
 import type { LayoutMode } from "../types";
 
-const STORAGE_KEY = "planning-central:last-selected-path";
-const DOCS_FOLDER_KEY = "planning-central:docs-folder";
-const SORT_MODE_KEY = "planning-central:sort-mode";
-const LAYOUT_MODE_KEY = "planning-central:layout-mode";
-const OPEN_PANES_KEY = "planning-central:open-panes";
+const STORAGE_KEY = "polar-markdown:last-selected-path";
+const DOCS_FOLDER_KEY = "polar-markdown:docs-folder";
+const SORT_MODE_KEY = "polar-markdown:sort-mode";
+const LAYOUT_MODE_KEY = "polar-markdown:layout-mode";
+const OPEN_PANES_KEY = "polar-markdown:open-panes";
 
 export function saveLastSelectedPath(path: string): void {
   localStorage.setItem(STORAGE_KEY, path);

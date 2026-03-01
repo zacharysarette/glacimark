@@ -1,6 +1,6 @@
-# Planning Central Rendering Museum
+# Polar Markdown Rendering Museum
 
-Welcome to **Planning Central** — your local markdown viewer with diagram support. This file showcases every rendering feature so you can verify they all work correctly.
+Welcome to **Polar Markdown** — your local markdown viewer with diagram support. This file showcases every rendering feature so you can verify they all work correctly.
 
 ---
 
@@ -8,7 +8,7 @@ Welcome to **Planning Central** — your local markdown viewer with diagram supp
 
 ### Relative Path (Local Image)
 
-![Planning Central Logo](../img/logo.png "The Planning Central polar bear")
+![Polar Markdown Logo](../img/logo.png "The Polar Markdown polar bear")
 
 ### External URL
 
@@ -26,7 +26,7 @@ Welcome to **Planning Central** — your local markdown viewer with diagram supp
 
 ```javascript
 function hello() {
-  console.log("Hello from Planning Central!");
+  console.log("Hello from Polar Markdown!");
 }
 
 const features = ["markdown", "mermaid", "syntax highlighting", "images"];
@@ -37,7 +37,7 @@ features.forEach((f) => console.log(`Supports: ${f}`));
 
 ```rust
 fn main() {
-    let name = "Planning Central";
+    let name = "Polar Markdown";
     println!("Welcome to {}!", name);
 
     let features = vec!["file tree", "live reload", "dark theme"];
@@ -65,7 +65,7 @@ const features: Feature[] = [
 
 ```json
 {
-  "app": "Planning Central",
+  "app": "Polar Markdown",
   "version": "0.1.0",
   "features": ["markdown", "mermaid", "svgbob", "images", "search"]
 }
@@ -128,7 +128,7 @@ stateDiagram-v2
 
 ```
 ┌─────────────────────────────────┐
-│       Planning Central          │
+│       Polar Markdown          │
 ├────────────┬────────────────────┤
 │  Sidebar   │   Content Area     │
 │            │                    │
@@ -235,4 +235,4 @@ Content below the rule.
 
 ---
 
-*This file is a rendering museum — every feature of Planning Central displayed in one place.*
+*This file is a rendering museum — every feature of Polar Markdown displayed in one place.*

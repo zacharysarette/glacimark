@@ -1,4 +1,4 @@
-# Planning Central — Next Steps
+# Polar Markdown — Next Steps
 
 ## Project Context
 
@@ -28,14 +28,14 @@ Desktop markdown editor built with **Tauri 2.10 + Svelte 5 + TypeScript**. Has a
 ### Status: DONE
 
 ### Problem
-The help button loads `How to Use Planning Central.md` from the app's `docs/` folder at runtime using `get_docs_path()`. This only works if the docs folder exists relative to the executable. When the app is installed to Program Files or run from a different location, the help file may not be found.
+The help button loads `How to Use Polar Markdown.md` from the app's `docs/` folder at runtime using `get_docs_path()`. This only works if the docs folder exists relative to the executable. When the app is installed to Program Files or run from a different location, the help file may not be found.
 
 ### Solution: Rust `include_str!`
 Compile the help file directly into the binary at build time using Rust's `include_str!` macro. This reads the file at compile time and embeds it as a string constant in the executable. No runtime file access needed.
 
 ```rust
 // In commands/filesystem.rs
-const HELP_CONTENT: &str = include_str!("../../docs/How to Use Planning Central.md");
+const HELP_CONTENT: &str = include_str!("../../docs/How to Use Polar Markdown.md");
 
 #[tauri::command]
 pub fn get_help_content() -> String {
@@ -169,7 +169,7 @@ Extend `src/lib/services/persistence.ts` with:
 - `saveDocsFolder(path: string): void`
 - `getDocsFolder(): string | null`
 
-Use a separate localStorage key like `"planning-central:docs-folder"`.
+Use a separate localStorage key like `"polar-markdown:docs-folder"`.
 
 #### 4. Update App.svelte
 
@@ -281,13 +281,13 @@ Copy this file to your Desktop. Double-click to run. **Caveat:** it will look fo
 
 ### Option B: NSIS Installer (recommended for distribution)
 ```
-src-tauri\target\release\bundle\nsis\Planning Central_0.1.0_x64-setup.exe
+src-tauri\target\release\bundle\nsis\Polar Markdown_0.1.0_x64-setup.exe
 ```
 Double-click this to install the app to Program Files with a Start Menu shortcut and Desktop shortcut. Includes an uninstaller.
 
 ### Option C: MSI Installer (enterprise/IT deployment)
 ```
-src-tauri\target\release\bundle\msi\Planning Central_0.1.0_x64_en-US.msi
+src-tauri\target\release\bundle\msi\Polar Markdown_0.1.0_x64_en-US.msi
 ```
 Standard Windows Installer package, good for Group Policy deployment.
 
@@ -556,13 +556,13 @@ Copy this file to your Desktop. Double-click to run. **Caveat:** it will look fo
 
 ### Option B: NSIS Installer (recommended for distribution)
 ```
-src-tauri\target\release\bundle\nsis\Planning Central_0.1.0_x64-setup.exe
+src-tauri\target\release\bundle\nsis\Polar Markdown_0.1.0_x64-setup.exe
 ```
 Double-click this to install the app to Program Files with a Start Menu shortcut and Desktop shortcut. Includes an uninstaller.
 
 ### Option C: MSI Installer (enterprise/IT deployment)
 ```
-src-tauri\target\release\bundle\msi\Planning Central_0.1.0_x64_en-US.msi
+src-tauri\target\release\bundle\msi\Polar Markdown_0.1.0_x64_en-US.msi
 ```
 Standard Windows Installer package, good for Group Policy deployment.
 
@@ -909,7 +909,7 @@ When multiple panes are open:
 Shipped in v0.4.0 with: split-pane CodeMirror 6 editor + live preview, auto-save (1s debounce) + Ctrl+S, bidirectional scroll sync, active line highlighting with table cell targeting, search highlighting in editor, watcher feedback loop prevention, image layout shift fix.
 
 ### Problem (original)
-Planning Central is currently read-only. Users have to edit markdown files in a separate text editor, then switch back to see the rendered result. For a planning tool, editing should be built-in.
+Polar Markdown is currently read-only. Users have to edit markdown files in a separate text editor, then switch back to see the rendered result. For a planning tool, editing should be built-in.
 
 ### Solution
 Add a split-pane editor view: raw markdown editor on one side, live preview on the other. Includes Mermaid diagram editing with live-rendered previews.
@@ -1125,7 +1125,7 @@ If multi-file viewing is implemented first, each pane can independently be in Vi
 ### Status: TODO
 
 ### Problem
-Users can edit existing files but cannot create new markdown files from within Planning Central. They have to use a separate file manager or terminal to create files, then switch back.
+Users can edit existing files but cannot create new markdown files from within Polar Markdown. They have to use a separate file manager or terminal to create files, then switch back.
 
 ### Solution
 Add a "New File" button to the sidebar header. Clicking it creates a new `.md` file in the current directory and opens it in edit mode.
@@ -1504,7 +1504,7 @@ Expose `validate_mermaid` and `fix_mermaid` as MCP tools so Claude Code can vali
 ## Future: MCP Server for Claude Code Integration
 
 ### Vision
-Expose Planning Central's capabilities as an MCP (Model Context Protocol) server so AI tools like Claude Code can read, write, validate, and search markdown docs programmatically. This turns Planning Central from a standalone viewer into an AI-accessible knowledge base.
+Expose Polar Markdown's capabilities as an MCP (Model Context Protocol) server so AI tools like Claude Code can read, write, validate, and search markdown docs programmatically. This turns Polar Markdown from a standalone viewer into an AI-accessible knowledge base.
 
 ### Why MCP
 Claude Code already supports MCP servers. An MCP server would let Claude Code:
@@ -1530,7 +1530,7 @@ Claude Code already supports MCP servers. An MCP server would let Claude Code:
 
 #### Option A: Standalone MCP Server (Node.js process)
 
-A separate Node.js process that implements the MCP protocol and talks to Planning Central's backend via Tauri IPC or directly to the filesystem.
+A separate Node.js process that implements the MCP protocol and talks to Polar Markdown's backend via Tauri IPC or directly to the filesystem.
 
 ```
 Claude Code  ←→  MCP Server (Node.js)  ←→  Filesystem (docs/)
@@ -1604,7 +1604,7 @@ Users add the server to their Claude Code MCP config:
 ```json
 {
   "mcpServers": {
-    "planning-central": {
+    "polar-markdown": {
       "command": "node",
       "args": ["./mcp-server/dist/index.js", "--docs-path", "./docs"]
     }
@@ -1721,9 +1721,9 @@ Each feature is independently shippable and testable. Build, test, and verify af
 
 ## Self-Documenting Requirement
 
-**`docs/How to Use Planning Central.md`** is the in-app user guide. A help button (?) in the sidebar header loads this file in the viewer regardless of what folder is currently open.
+**`docs/How to Use Polar Markdown.md`** is the in-app user guide. A help button (?) in the sidebar header loads this file in the viewer regardless of what folder is currently open.
 
-**Rule:** Every time a new feature ships, update `How to Use Planning Central.md` to document it. This keeps the app self-documenting — users can always click the help button to see up-to-date instructions rendered inside Planning Central itself.
+**Rule:** Every time a new feature ships, update `How to Use Polar Markdown.md` to document it. This keeps the app self-documenting — users can always click the help button to see up-to-date instructions rendered inside Polar Markdown itself.
 
 ---
 

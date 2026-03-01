@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ============================================================================
-# Planning Central — macOS / Linux Release Script
+# Polar Markdown — macOS / Linux Release Script
 # ============================================================================
 #
 # SAFETY: This script contains NO secrets or credentials. It relies on:
@@ -41,7 +41,7 @@ OS="$(uname -s)"
 ARCH="$(uname -m)"
 
 echo ""
-echo "=== Planning Central Release ${TAG} (${OS} ${ARCH}) ==="
+echo "=== Polar Markdown Release ${TAG} (${OS} ${ARCH}) ==="
 echo ""
 
 # --- Step 0: Switch to master and pull latest ---
@@ -72,9 +72,9 @@ case "${OS}" in
 
         # Label with architecture
         if [ "${ARCH}" = "arm64" ]; then
-            ARTIFACTS+=("${DMG}#Planning Central (macOS Apple Silicon .dmg)")
+            ARTIFACTS+=("${DMG}#Polar Markdown (macOS Apple Silicon .dmg)")
         else
-            ARTIFACTS+=("${DMG}#Planning Central (macOS Intel .dmg)")
+            ARTIFACTS+=("${DMG}#Polar Markdown (macOS Intel .dmg)")
         fi
         ;;
     Linux)
@@ -89,11 +89,11 @@ case "${OS}" in
 
         if [ -n "${DEB}" ]; then
             echo "  Found: ${DEB}"
-            ARTIFACTS+=("${DEB}#Planning Central (.deb)")
+            ARTIFACTS+=("${DEB}#Polar Markdown (.deb)")
         fi
         if [ -n "${APPIMAGE}" ]; then
             echo "  Found: ${APPIMAGE}"
-            ARTIFACTS+=("${APPIMAGE}#Planning Central (.AppImage)")
+            ARTIFACTS+=("${APPIMAGE}#Polar Markdown (.AppImage)")
         fi
         ;;
     *)
@@ -123,7 +123,7 @@ if gh release view "${TAG}" &>/dev/null; then
     gh release upload "${TAG}" "${ARTIFACTS[@]}" --clobber
 else
     echo "  Creating new release ${TAG}..."
-    NOTES="Planning Central ${TAG}"
+    NOTES="Polar Markdown ${TAG}"
     case "${OS}" in
         Darwin) NOTES="${NOTES} — macOS ${ARCH} installer." ;;
         Linux)  NOTES="${NOTES} — Linux installers (.deb and/or .AppImage)." ;;
@@ -131,7 +131,7 @@ else
 
     gh release create "${TAG}" \
         "${ARTIFACTS[@]}" \
-        --title "Planning Central ${TAG}" \
+        --title "Polar Markdown ${TAG}" \
         --notes "${NOTES}"
 fi
 

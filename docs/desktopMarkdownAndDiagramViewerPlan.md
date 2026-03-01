@@ -1,8 +1,8 @@
-# Planning Central - Desktop Markdown & Diagram Viewer
+# Polar Markdown - Desktop Markdown & Diagram Viewer
 
 ## Context
 
-You want a central place to hold all your planning markdown files with the ability to visualize Mermaid diagrams beautifully — like a lightweight, custom viewer that Claude can easily generate content for. The `claude_planning_central` folder is currently empty, so we're building from scratch.
+You want a central place to hold all your planning markdown files with the ability to visualize Mermaid diagrams beautifully — like a lightweight, custom viewer that Claude can easily generate content for. The `claude_polar_markdown` folder is currently empty, so we're building from scratch.
 
 **MVP scope:** File tree sidebar + markdown renderer + Mermaid diagrams + live reload. No editor, no search, no graph view — those can come in future iterations.
 
@@ -27,10 +27,10 @@ You want a central place to hold all your planning markdown files with the abili
 
 ## Project Structure
 
-The Tauri app lives in `claude_planning_central/`. Markdown files go in `docs/` subfolder.
+The Tauri app lives in `claude_polar_markdown/`. Markdown files go in `docs/` subfolder.
 
 ```
-claude_planning_central/
+claude_polar_markdown/
 ├── docs/                              # YOUR MARKDOWN FILES GO HERE
 │   └── test.md                        # Sample test file
 ├── src-tauri/                         # Rust backend
@@ -68,7 +68,7 @@ claude_planning_central/
 
 ### Step 1: Scaffold project
 ```bash
-npm create tauri-app@latest claude_planning_central -- --template svelte-ts
+npm create tauri-app@latest claude_polar_markdown -- --template svelte-ts
 npm install
 npm run tauri dev  # verify it boots
 ```
@@ -139,7 +139,7 @@ notify = "7"
 - `main.ts` — Import `highlight.js/styles/github-dark.css`
 
 ### Step 10: Window config
-Update `tauri.conf.json`: title "Planning Central", 1200x800, min 800x600
+Update `tauri.conf.json`: title "Polar Markdown", 1200x800, min 800x600
 
 ### Step 11: Create test content
 Create `docs/test.md` with headings, code blocks, and Mermaid diagrams to verify everything works.
@@ -155,12 +155,12 @@ Create `docs/test.md` with headings, code blocks, and Mermaid diagrams to verify
 ## Sample Test File (`docs/test.md`)
 
 ````markdown
-# Planning Central Test
+# Polar Markdown Test
 
 ## Code Block
 ```javascript
 function hello() {
-  console.log("Hello from Planning Central!");
+  console.log("Hello from Polar Markdown!");
 }
 ```
 

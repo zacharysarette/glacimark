@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Planning Central",
+  "productName": "Polar Markdown",
   "version": "0.4.0",
-  "identifier": "com.planningcentral.app",
+  "identifier": "com.polarmarkdown.app",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Planning Central",
+        "title": "Polar Markdown",
         "width": 1200,
         "height": 800,
         "minWidth": 800,

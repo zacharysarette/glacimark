@@ -2,7 +2,7 @@
 setlocal
 
 :: ============================================================================
-:: Planning Central — Windows Release Script
+:: Polar Markdown — Windows Release Script
 :: ============================================================================
 ::
 :: SAFETY: This script contains NO secrets or credentials. It relies on:
@@ -33,11 +33,11 @@ if "%~1"=="" (
 
 set VERSION=%~1
 set TAG=v%VERSION%
-set NSIS=src-tauri\target\release\bundle\nsis\Planning Central_%VERSION%_x64-setup.exe
-set MSI=src-tauri\target\release\bundle\msi\Planning Central_%VERSION%_x64_en-US.msi
+set NSIS=src-tauri\target\release\bundle\nsis\Polar Markdown_%VERSION%_x64-setup.exe
+set MSI=src-tauri\target\release\bundle\msi\Polar Markdown_%VERSION%_x64_en-US.msi
 
 echo.
-echo === Planning Central Release %TAG% ===
+echo === Polar Markdown Release %TAG% ===
 echo.
 
 :: Step 0: Switch to master and pull latest
@@ -87,7 +87,7 @@ if not errorlevel 1 (
     echo Release %TAG% already exists — uploading Windows artifacts...
     echo.
     echo [4/5] Uploading artifacts to existing release...
-    gh release upload %TAG% "%NSIS%#Planning Central Installer (NSIS)" "%MSI%#Planning Central Installer (MSI)" --clobber
+    gh release upload %TAG% "%NSIS%#Polar Markdown Installer (NSIS)" "%MSI%#Polar Markdown Installer (MSI)" --clobber
     if errorlevel 1 (
         echo Upload failed.
         exit /b 1
@@ -99,10 +99,10 @@ if not errorlevel 1 (
 echo.
 echo [4/5] Creating GitHub Release %TAG%...
 gh release create %TAG% ^
-    "%NSIS%#Planning Central Installer (NSIS)" ^
-    "%MSI%#Planning Central Installer (MSI)" ^
-    --title "Planning Central %TAG%" ^
-    --notes "Planning Central %TAG% — Windows x64 installers. Run the NSIS .exe (recommended) or MSI to install."
+    "%NSIS%#Polar Markdown Installer (NSIS)" ^
+    "%MSI%#Polar Markdown Installer (MSI)" ^
+    --title "Polar Markdown %TAG%" ^
+    --notes "Polar Markdown %TAG% — Windows x64 installers. Run the NSIS .exe (recommended) or MSI to install."
 
 if errorlevel 1 (
     echo Release creation failed.

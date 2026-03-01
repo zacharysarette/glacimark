@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="img/logo.png" alt="Planning Central" width="220">
+  <img src="img/logo.png" alt="Polar Markdown" width="220">
 </p>
 
-<h1 align="center">Planning Central</h1>
+<h1 align="center">Polar Markdown</h1>
 
 <p align="center">
-  <strong>A desktop markdown editor with live preview and Mermaid diagram support</strong><br>
-  Built with <b>Tauri 2</b> + <b>Svelte 5</b> + <b>TypeScript</b>
+  <strong>A blazing-fast desktop markdown editor and viewer with live preview and diagram support</strong><br>
+  Built with <b>Tauri 2</b> + <b>Svelte 5</b> + <b>TypeScript</b> &mdash; ~5 MB app, ~40 MB RAM
 </p>
 
 <p align="center">
@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <em>Write, edit, and view markdown documentation with live-rendered diagrams — all in a fast native app.</em>
+  <em>Write, edit, and view markdown with live-rendered Mermaid diagrams, split-pane editing, full-text search, and instant file watching — all in a native app that starts in under a second.</em>
 </p>
 
 ---
@@ -196,7 +196,7 @@ src-tauri/                  # Rust backend
       filesystem.rs         # Directory tree, file read/write, search, help content
       watcher.rs            # Native file system watcher
       diagram.rs            # svgbob ASCII → SVG conversion
-docs/                       # In-app documentation (viewable in Planning Central)
+docs/                       # In-app documentation (viewable in Polar Markdown)
 release.bat                 # Windows release script
 release.sh                  # macOS / Linux release script
 ```
