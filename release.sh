@@ -44,6 +44,12 @@ echo ""
 echo "=== Planning Central Release ${TAG} (${OS} ${ARCH}) ==="
 echo ""
 
+# --- Step 0: Switch to master and pull latest ---
+echo "[0/5] Switching to master and pulling latest..."
+git checkout master
+git fetch origin
+git pull origin master
+
 # --- Step 1: Build ---
 echo "[1/5] Building..."
 npx tauri build

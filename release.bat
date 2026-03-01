@@ -40,6 +40,20 @@ echo.
 echo === Planning Central Release %TAG% ===
 echo.
 
+:: Step 0: Switch to master and pull latest
+echo [0/5] Switching to master and pulling latest...
+git checkout master
+if errorlevel 1 (
+    echo Failed to checkout master.
+    exit /b 1
+)
+git fetch origin
+git pull origin master
+if errorlevel 1 (
+    echo Failed to pull latest master.
+    exit /b 1
+)
+
 :: Step 1: Build
 echo [1/5] Building...
 call npx tauri build
