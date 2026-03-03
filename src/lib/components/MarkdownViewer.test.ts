@@ -266,6 +266,22 @@ describe("MarkdownViewer", () => {
       expect(preventSpy).toHaveBeenCalled();
     });
 
+    it("decodes %20 in href before calling onfilelink", async () => {
+      const onfilelink = vi.fn();
+      const { container } = render(MarkdownViewer, {
+        props: { content: "[Guide](<How to Use Polar Markdown.md>)", filePath: "/docs/test.md", onfilelink },
+      });
+
+      await vi.waitFor(() => {
+        expect(container.querySelector("a")).not.toBeNull();
+      });
+
+      const link = container.querySelector("a") as HTMLAnchorElement;
+      link.click();
+
+      expect(onfilelink).toHaveBeenCalledWith("/docs/How to Use Polar Markdown.md", undefined, false);
+    });
+
     it("subdirectory relative paths resolved correctly", async () => {
       const onfilelink = vi.fn();
       const { container } = render(MarkdownViewer, {

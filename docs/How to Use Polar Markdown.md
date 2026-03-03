@@ -2,6 +2,8 @@
 
 Polar Markdown is a desktop markdown viewer with Mermaid diagram support. It lets you browse, read, and navigate markdown files with live-rendered diagrams.
 
+Want to see all the markdown features in action? Check out the [Rendering Museum](test.md) — it showcases every rendering capability in one place.
+
 ---
 
 ## Getting Started
@@ -279,5 +281,5 @@ Polar Markdown watches your folder for changes in real time. If you edit a markd
 - **Widescreen monitors:** Use the layout toggle (top-right of the content area) to switch between centered and multi-column modes.
 - **Multiple folders:** Use the folder button to switch between different documentation directories. Each folder's state is independent.
 - **CLI usage:** After installing with the NSIS installer, run `polarmd` from any terminal to launch the app, or `polarmd file.md` to open a specific file.
-- **Rendering museum:** Open `docs/test.md` to see every rendering feature in one place — headings, code blocks, Mermaid diagrams, ASCII art, tables, images, anchor links, and more. Great for verifying everything works after updates.
+- **Rendering museum:** Open [the Rendering Museum](test.md) to see every rendering feature in one place — headings, code blocks, Mermaid diagrams, ASCII art, tables, images, anchor links, and more. Great for verifying everything works after updates.
 - **Dogfooding:** Polar Markdown's own documentation lives in the `docs/` folder — you're reading it right now!

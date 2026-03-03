@@ -10,6 +10,7 @@
     startWatching,
     getDocsPath,
     getHelpContent,
+    getMuseumContent,
     pickFolder,
     searchFiles,
     createFile,
@@ -661,15 +662,48 @@
     }
   }
 
+  /** Map of virtual filenames to their embedded content loaders. */
+  const EMBEDDED_DOCS: Record<string, () => Promise<string>> = {
+    "How to Use Polar Markdown.md": getHelpContent,
+    "test.md": getMuseumContent,
+  };
+
   async function handleFileLink(path: string, hash?: string, ctrlKey?: boolean) {
     scrollToId = "";
+
+    // When navigating from a read-only (embedded) pane, check for embedded targets
+    const activePane = panes.find((p) => p.id === activePaneId);
+    if (activePane?.readOnly) {
+      const filename = path.split("/").pop() ?? path;
+      const loader = EMBEDDED_DOCS[filename];
+      if (loader) {
+        const content = await loader();
+        if (ctrlKey && panes.length < MAX_PANES) {
+          const id = createPaneId();
+          panes = [...panes, { id, path: filename, content, readOnly: true, editMode: false }];
+          activePaneId = id;
+        } else {
+          panes = panes.map((p) =>
+            p.id === activePaneId
+              ? { ...p, path: filename, content, readOnly: true, editMode: false }
+              : p
+          );
+        }
+        if (hash) {
+          await tick();
+          scrollToId = hash;
+        }
+        return;
+      }
+    }
+
+    // Normal file link handling (reads from disk)
     if (ctrlKey && panes.length < MAX_PANES) {
       await openInNewPane(path);
     } else {
       await openInActivePane(path);
     }
     if (hash) {
-      // Small delay to let content render before scrolling
       await tick();
       scrollToId = hash;
     }

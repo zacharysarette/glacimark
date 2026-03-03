@@ -412,10 +412,11 @@
     // Branch 3: .md file links — navigate within app
     // Split href into path and optional hash: "file.md#section" → ["file.md", "section"]
     const [linkPath, hash] = href.split("#", 2);
-    if (linkPath.endsWith(".md")) {
+    const decodedPath = decodeURIComponent(linkPath);
+    if (decodedPath.endsWith(".md")) {
       event.preventDefault();
       const dir = getDirectory(filePath);
-      const resolvedPath = dir ? resolvePath(dir, linkPath) : linkPath;
+      const resolvedPath = dir ? resolvePath(dir, decodedPath) : decodedPath;
       onfilelink?.(resolvedPath, hash || undefined, event.ctrlKey);
       return;
     }

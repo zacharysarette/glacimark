@@ -95,6 +95,7 @@ pub fn run() {
             commands::filesystem::write_file_contents,
             commands::filesystem::get_docs_path,
             commands::filesystem::get_help_content,
+            commands::filesystem::get_museum_content,
             commands::filesystem::search_files,
             commands::filesystem::create_file,
             commands::filesystem::rename_file,
