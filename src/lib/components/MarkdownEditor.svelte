@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { EditorView, Decoration, type DecorationSet } from "@codemirror/view";
-  import { EditorState, StateField, StateEffect } from "@codemirror/state";
+  import { EditorState, StateField, StateEffect, Compartment } from "@codemirror/state";
   import { markdown } from "@codemirror/lang-markdown";
-  import { oneDark } from "@codemirror/theme-one-dark";
   import { basicSetup } from "codemirror";
+  import { auroraTheme, glacierTheme } from "../services/codemirror-themes";
+  import type { ThemeType } from "../types";
 
   let {
     content = "",
@@ -12,17 +13,24 @@
     highlightText = "",
     highlightKey = 0,
     onactiveline,
+    theme = "aurora" as ThemeType,
   }: {
     content?: string;
     onchange?: (content: string) => void;
     highlightText?: string;
     highlightKey?: number;
     onactiveline?: (lineContent: string, lineNumber: number, totalLines: number, column: number) => void;
+    theme?: ThemeType;
   } = $props();
 
   let containerEl: HTMLDivElement | undefined = $state();
   let view: EditorView | undefined;
   let suppressNextChange = false;
+  const themeCompartment = new Compartment();
+
+  function getThemeExtension(t: ThemeType) {
+    return t === "aurora" ? auroraTheme : glacierTheme;
+  }
 
   // Search highlight via CodeMirror decorations
   const setSearchText = StateEffect.define<string>();
@@ -72,14 +80,12 @@
       extensions: [
         basicSetup,
         markdown(),
-        oneDark,
+        themeCompartment.of(getThemeExtension(theme)),
         searchHighlightField,
         EditorView.theme({
           "&": { height: "100%", fontSize: "14px" },
           ".cm-scroller": { overflow: "auto" },
           ".cm-content": { fontFamily: "'JetBrains Mono', 'Fira Code', monospace" },
-          ".cm-search-highlight": { backgroundColor: "rgba(224, 175, 104, 0.35)", borderRadius: "2px" },
-          ".cm-activeLine": { backgroundColor: "rgba(122, 162, 247, 0.08) !important" },
         }),
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
@@ -105,6 +111,15 @@
     });
     view.focus();
 
+  });
+
+  // Reconfigure theme when it changes
+  $effect(() => {
+    if (!view) return;
+    const ext = getThemeExtension(theme);
+    view.dispatch({
+      effects: themeCompartment.reconfigure(ext),
+    });
   });
 
   // If the content prop changes externally (e.g. initial load timing), sync the editor

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { FileEntry, SearchResult } from "../types";
+  import type { FileEntry, SearchResult, ThemeType } from "../types";
   import FileTree from "./FileTree.svelte";
   import SearchResults from "./SearchResults.svelte";
   import { dragSourcePath, resetDragSource } from "./FileTreeItem.svelte";
@@ -45,6 +45,8 @@
     ondelete,
     onsaveas,
     docsPath = "",
+    theme = "aurora" as ThemeType,
+    onthemetoggle,
   }: {
     entries: FileEntry[];
     selectedPath?: string;
@@ -84,6 +86,8 @@
     ondelete?: (path: string) => void;
     onsaveas?: (path: string) => void;
     docsPath?: string;
+    theme?: ThemeType;
+    onthemetoggle?: () => void;
   } = $props();
 
   const sortLabels: Record<SortMode, string> = {
@@ -176,11 +180,16 @@
 <aside class="sidebar" aria-label="File browser">
   <header class="sidebar-header">
     <div class="header-actions">
+      {#if onthemetoggle}
+        <button class="theme-toggle-btn" onclick={onthemetoggle} title={theme === "aurora" ? "Switch to Glacier (light)" : "Switch to Aurora (dark)"}>
+          {theme === "aurora" ? "☀️" : "🌙"}
+        </button>
+      {/if}
       {#if onnewfile}
         <button class="new-file-btn" onclick={onnewfile} title="New file">+</button>
       {/if}
       {#if onnewfolder}
-        <button class="new-folder-btn" onclick={onnewfolder} title="New folder">📁+</button>
+        <button class="new-folder-btn" onclick={onnewfolder} title="New folder">🧊+</button>
       {/if}
       {#if onsortchange}
         <button class="sort-btn" onclick={onsortchange} title="Sort files">
@@ -192,7 +201,7 @@
       {/if}
       {#if onchangefolder}
         <button class="change-folder-btn" onclick={onchangefolder} title="Change folder">
-          <span class="folder-icon">📁</span>
+          <span class="folder-icon">🧊</span>
         </button>
       {/if}
     </div>
@@ -271,7 +280,7 @@
           <span class="create-target-hint">in {selectedFolderPath.split(/[\\/]/).pop()}/</span>
         {/if}
         <div class="new-file-row">
-          <span class="folder-hint-icon">📁</span>
+          <span class="folder-hint-icon">🧊</span>
           <input
             type="text"
             bind:value={newFolderName}
@@ -309,15 +318,15 @@
   .sidebar {
     display: flex;
     flex-direction: column;
-    background: #1e1f2e;
-    border-right: 1px solid #2f3146;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border);
     height: 100%;
     overflow: hidden;
   }
 
   .sidebar-header {
     padding: 16px;
-    border-bottom: 1px solid #2f3146;
+    border-bottom: 1px solid var(--border);
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -330,27 +339,42 @@
     align-items: center;
   }
 
+  .theme-toggle-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 2px 6px;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .theme-toggle-btn:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent);
+  }
+
   .sort-btn {
     background: none;
-    border: 1px solid #2f3146;
+    border: 1px solid var(--border);
     border-radius: 4px;
     cursor: pointer;
     padding: 2px 8px;
     font-size: 11px;
     line-height: 1;
-    color: #a9b1d6;
+    color: var(--text-secondary);
     font-weight: 500;
   }
 
   .sort-btn:hover {
-    background: rgba(122, 162, 247, 0.1);
-    border-color: #7aa2f7;
-    color: #7aa2f7;
+    background: var(--accent-hover);
+    border-color: var(--accent);
+    color: var(--accent);
   }
 
   .help-btn {
     background: none;
-    border: 1px solid #2f3146;
+    border: 1px solid var(--border);
     border-radius: 50%;
     cursor: pointer;
     width: 22px;
@@ -358,28 +382,28 @@
     font-size: 12px;
     font-weight: 700;
     line-height: 1;
-    color: #a9b1d6;
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
   .help-btn:hover {
-    background: rgba(122, 162, 247, 0.1);
-    border-color: #7aa2f7;
-    color: #7aa2f7;
+    background: var(--accent-hover);
+    border-color: var(--accent);
+    color: var(--accent);
   }
 
   .help-btn.help-active {
-    background: rgba(122, 162, 247, 0.25);
-    border-color: #7aa2f7;
-    color: #7aa2f7;
-    box-shadow: 0 0 6px rgba(122, 162, 247, 0.3);
+    background: var(--accent-active);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 6px var(--accent-outline);
   }
 
   .change-folder-btn {
     background: none;
-    border: 1px solid #2f3146;
+    border: 1px solid var(--border);
     border-radius: 4px;
     cursor: pointer;
     padding: 2px 6px;
@@ -388,24 +412,24 @@
   }
 
   .change-folder-btn:hover {
-    background: rgba(122, 162, 247, 0.1);
-    border-color: #7aa2f7;
+    background: var(--accent-hover);
+    border-color: var(--accent);
   }
 
   .folder-path {
     padding: 8px 16px;
     font-size: 11px;
-    color: #565f89;
+    color: var(--text-muted);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     flex-shrink: 0;
-    border-top: 1px solid #2f3146;
+    border-top: 1px solid var(--border);
   }
 
   .filter-bar {
     padding: 8px 12px;
-    border-bottom: 1px solid #2f3146;
+    border-bottom: 1px solid var(--border);
     flex-shrink: 0;
   }
 
@@ -418,10 +442,10 @@
   .filter-input {
     flex: 1;
     padding: 6px 10px;
-    background: #16172b;
-    border: 1px solid #2f3146;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
     border-radius: 4px;
-    color: #a9b1d6;
+    color: var(--text-secondary);
     font-size: 13px;
     outline: none;
     box-sizing: border-box;
@@ -429,16 +453,16 @@
   }
 
   .filter-input:focus {
-    border-color: #7aa2f7;
+    border-color: var(--accent);
   }
 
   .filter-input::placeholder {
-    color: #565f89;
+    color: var(--text-muted);
   }
 
   .search-toggle {
     background: none;
-    border: 1px solid #2f3146;
+    border: 1px solid var(--border);
     border-radius: 4px;
     cursor: pointer;
     padding: 4px 6px;
@@ -448,18 +472,18 @@
   }
 
   .search-toggle:hover {
-    background: rgba(122, 162, 247, 0.1);
-    border-color: #7aa2f7;
+    background: var(--accent-hover);
+    border-color: var(--accent);
   }
 
   .search-toggle.active {
-    background: rgba(122, 162, 247, 0.2);
-    border-color: #7aa2f7;
+    background: var(--accent-active);
+    border-color: var(--accent);
   }
 
   .searching {
     padding: 16px;
-    color: #565f89;
+    color: var(--text-muted);
     font-size: 13px;
     font-style: italic;
   }
@@ -471,47 +495,47 @@
   }
 
   .sidebar-content.nav-drag-over {
-    border-bottom: 2px solid #9ece6a;
+    border-bottom: 2px solid var(--green);
   }
 
   .new-file-btn {
     background: none;
-    border: 1px solid #2f3146;
+    border: 1px solid var(--border);
     border-radius: 4px;
     cursor: pointer;
     padding: 2px 8px;
     font-size: 14px;
     font-weight: 700;
     line-height: 1;
-    color: #a9b1d6;
+    color: var(--text-secondary);
   }
 
   .new-file-btn:hover {
-    background: rgba(122, 162, 247, 0.1);
-    border-color: #7aa2f7;
-    color: #7aa2f7;
+    background: var(--accent-hover);
+    border-color: var(--accent);
+    color: var(--accent);
   }
 
   .new-folder-btn {
     background: none;
-    border: 1px solid #2f3146;
+    border: 1px solid var(--border);
     border-radius: 4px;
     cursor: pointer;
     padding: 2px 6px;
     font-size: 11px;
     line-height: 1;
-    color: #a9b1d6;
+    color: var(--text-secondary);
   }
 
   .new-folder-btn:hover {
-    background: rgba(158, 206, 106, 0.1);
-    border-color: #9ece6a;
-    color: #9ece6a;
+    background: var(--green-hover);
+    border-color: var(--green);
+    color: var(--green);
   }
 
   .create-target-hint {
     font-size: 11px;
-    color: #9ece6a;
+    color: var(--green);
     margin-bottom: 4px;
     display: block;
   }
@@ -523,7 +547,7 @@
 
   .new-file-input {
     padding: 8px 12px;
-    border-bottom: 1px solid #2f3146;
+    border-bottom: 1px solid var(--border);
     flex-shrink: 0;
   }
 
@@ -535,26 +559,26 @@
 
   .create-file-btn {
     background: none;
-    border: 1px solid #2f3146;
+    border: 1px solid var(--border);
     border-radius: 4px;
     cursor: pointer;
     padding: 4px 8px;
     font-size: 14px;
     font-weight: 700;
     line-height: 1;
-    color: #9ece6a;
+    color: var(--green);
     flex-shrink: 0;
   }
 
   .create-file-btn:hover {
-    background: rgba(158, 206, 106, 0.1);
-    border-color: #9ece6a;
-    box-shadow: 0 0 6px rgba(158, 206, 106, 0.3);
+    background: var(--green-hover);
+    border-color: var(--green);
+    box-shadow: 0 0 6px var(--green-outline);
   }
 
   .new-file-error {
     margin: 4px 0 0;
-    color: #f7768e;
+    color: var(--red);
     font-size: 12px;
   }
 </style>

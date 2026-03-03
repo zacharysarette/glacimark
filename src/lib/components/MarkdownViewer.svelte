@@ -398,7 +398,7 @@
     </article>
   {:else}
     <div class="empty-state">
-      <div class="empty-icon">📝</div>
+      <div class="empty-icon">🐻‍❄️</div>
       <h2>Polar Markdown</h2>
       <p>Select a markdown file from the sidebar to view it.</p>
     </div>
@@ -415,7 +415,7 @@
 
   .viewer-header {
     padding: 12px 24px;
-    border-bottom: 1px solid #2f3146;
+    border-bottom: 1px solid var(--border);
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -424,7 +424,7 @@
 
   .file-name {
     font-size: 13px;
-    color: #7aa2f7;
+    color: var(--accent);
     font-weight: 500;
   }
 
@@ -435,8 +435,8 @@
 
   .layout-controls button {
     background: transparent;
-    border: 1px solid #2f3146;
-    color: #565f89;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
     border-radius: 4px;
     width: 28px;
     height: 28px;
@@ -449,14 +449,14 @@
   }
 
   .layout-controls button:hover {
-    border-color: #7aa2f7;
-    color: #7aa2f7;
+    border-color: var(--accent);
+    color: var(--accent);
   }
 
   .layout-controls button.active {
-    background: #1a1b2e;
-    border-color: #7aa2f7;
-    color: #7aa2f7;
+    background: var(--bg-secondary);
+    border-color: var(--accent);
+    color: var(--accent);
   }
 
   .markdown-body {
@@ -474,7 +474,7 @@
   .markdown-body.columns {
     column-width: 400px;
     column-gap: 48px;
-    column-rule: 1px solid #2f3146;
+    column-rule: 1px solid var(--border);
   }
 
   .empty-state {
@@ -483,7 +483,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #565f89;
+    color: var(--text-muted);
     gap: 12px;
   }
 
@@ -492,7 +492,7 @@
   }
 
   .empty-state h2 {
-    color: #7aa2f7;
+    color: var(--accent);
     font-size: 24px;
   }
 

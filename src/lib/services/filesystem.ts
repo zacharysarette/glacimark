@@ -22,8 +22,8 @@ export async function getHelpContent(): Promise<string> {
   return invoke<string>("get_help_content");
 }
 
-export async function renderAsciiDiagram(input: string): Promise<string> {
-  return invoke<string>("render_ascii_diagram", { input });
+export async function renderAsciiDiagram(input: string, dark: boolean = true): Promise<string> {
+  return invoke<string>("render_ascii_diagram", { input, dark });
 }
 
 export async function searchFiles(path: string, query: string): Promise<SearchResult[]> {

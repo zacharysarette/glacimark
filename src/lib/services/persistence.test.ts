@@ -12,6 +12,8 @@ import {
   getOpenPanes,
   saveExpandedPaths,
   getExpandedPaths,
+  saveTheme,
+  getTheme,
 } from "./persistence";
 
 const STORAGE_KEY = "polar-markdown:last-selected-path";
@@ -132,5 +134,22 @@ describe("saveExpandedPaths / getExpandedPaths", () => {
   it("returns empty array for corrupt JSON", () => {
     localStorage.setItem("polar-markdown:expanded-paths", "not-json");
     expect(getExpandedPaths()).toEqual([]);
+  });
+});
+
+describe("saveTheme / getTheme", () => {
+  it("round-trips a theme value", () => {
+    saveTheme("glacier");
+    expect(getTheme()).toBe("glacier");
+  });
+
+  it("returns 'aurora' as the default when nothing stored", () => {
+    expect(getTheme()).toBe("aurora");
+  });
+
+  it("overwrites a previously saved theme", () => {
+    saveTheme("glacier");
+    saveTheme("aurora");
+    expect(getTheme()).toBe("aurora");
   });
 });

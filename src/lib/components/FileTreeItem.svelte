@@ -148,7 +148,7 @@
       style="padding-left: {paddingLeft}"
       data-path={entry.path}
     >
-      <span class="file-icon">📄</span>
+      <span class="file-icon">❄️</span>
       <!-- svelte-ignore a11y_autofocus -->
       <input
         type="text"
@@ -195,9 +195,9 @@
     >
       {#if entry.is_directory}
         <span class="chevron">{expanded ? "▼" : "▶"}</span>
-        <span class="folder-icon">📁</span>
+        <span class="folder-icon">🧊</span>
       {:else}
-        <span class="file-icon">📄</span>
+        <span class="file-icon">❄️</span>
       {/if}
       <span class="name">{entry.name}</span>
     </button>
@@ -237,7 +237,7 @@
     padding: 4px 8px;
     border: none;
     background: none;
-    color: #c0caf5;
+    color: var(--text-primary);
     font-size: 13px;
     cursor: pointer;
     text-align: left;
@@ -246,31 +246,31 @@
   }
 
   .tree-row:hover {
-    background: rgba(122, 162, 247, 0.1);
+    background: var(--accent-hover);
   }
 
   .tree-row.selected {
-    background: rgba(122, 162, 247, 0.2);
-    color: #7aa2f7;
+    background: var(--accent-active);
+    color: var(--accent);
   }
 
   .tree-row.focused {
-    outline: 1px solid rgba(122, 162, 247, 0.5);
-    background: rgba(122, 162, 247, 0.08);
+    outline: 1px solid var(--accent-outline);
+    background: var(--accent-focus);
   }
 
   .tree-row.directory {
-    color: #9ece6a;
+    color: var(--green);
   }
 
   .tree-row.folder-selected {
-    background: rgba(158, 206, 106, 0.15);
-    outline: 1px solid rgba(158, 206, 106, 0.4);
+    background: var(--green-active);
+    outline: 1px solid var(--green-outline);
   }
 
   .tree-row.drag-over {
-    background: rgba(158, 206, 106, 0.25);
-    outline: 2px dashed #9ece6a;
+    background: var(--green-strong);
+    outline: 2px dashed var(--green);
     outline-offset: -2px;
   }
 
@@ -298,10 +298,10 @@
   .rename-input {
     flex: 1;
     padding: 2px 6px;
-    background: #16172b;
-    border: 1px solid #7aa2f7;
+    background: var(--bg-input);
+    border: 1px solid var(--accent);
     border-radius: 3px;
-    color: #c0caf5;
+    color: var(--text-primary);
     font-size: 13px;
     font-family: inherit;
     outline: none;
@@ -311,7 +311,7 @@
   .rename-confirm-btn,
   .rename-cancel-btn {
     background: none;
-    border: 1px solid #2f3146;
+    border: 1px solid var(--border);
     border-radius: 3px;
     cursor: pointer;
     padding: 1px 5px;
@@ -322,26 +322,26 @@
   }
 
   .rename-confirm-btn {
-    color: #9ece6a;
+    color: var(--green);
   }
 
   .rename-confirm-btn:hover {
-    background: rgba(158, 206, 106, 0.1);
-    border-color: #9ece6a;
+    background: var(--green-hover);
+    border-color: var(--green);
   }
 
   .rename-cancel-btn {
-    color: #f7768e;
+    color: var(--red);
   }
 
   .rename-cancel-btn:hover {
-    background: rgba(247, 118, 142, 0.1);
-    border-color: #f7768e;
+    background: var(--red-hover);
+    border-color: var(--red);
   }
 
   .rename-error {
     margin: 2px 0 0;
-    color: #f7768e;
+    color: var(--red);
     font-size: 11px;
   }
 </style>

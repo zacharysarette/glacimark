@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import MarkdownEditor from "./MarkdownEditor.svelte";
   import MarkdownViewer from "./MarkdownViewer.svelte";
+  import type { ThemeType } from "../types";
 
   let {
     content = "",
@@ -9,12 +10,14 @@
     onsave,
     highlightText = "",
     highlightKey = 0,
+    theme = "aurora" as ThemeType,
   }: {
     content?: string;
     filePath?: string;
     onsave?: (path: string, content: string) => void;
     highlightText?: string;
     highlightKey?: number;
+    theme?: ThemeType;
   } = $props();
 
   let editContent = $state(content);
@@ -130,7 +133,7 @@
       <span class="cursor-pos">Ln {activeLineNumber}, Col {activeColumn}</span>
     </header>
     <div class="editor-content">
-      <MarkdownEditor content={editContent} onchange={handleEdit} {highlightText} {highlightKey} onactiveline={handleActiveLine} />
+      <MarkdownEditor content={editContent} onchange={handleEdit} {highlightText} {highlightKey} onactiveline={handleActiveLine} {theme} />
     </div>
   </div>
   <div class="preview-side">
@@ -154,17 +157,17 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border-right: 1px solid #2f3146;
+    border-right: 1px solid var(--border);
   }
 
   .editor-header {
     padding: 6px 12px;
-    border-bottom: 1px solid #2f3146;
+    border-bottom: 1px solid var(--border);
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #1e1f2e;
+    background: var(--bg-secondary);
     min-height: 32px;
   }
 
@@ -173,12 +176,12 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #7aa2f7;
+    color: var(--accent);
   }
 
   .cursor-pos {
     font-size: 11px;
-    color: #565f89;
+    color: var(--text-muted);
     font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", monospace;
   }
 
@@ -195,12 +198,12 @@
 
   .preview-header {
     padding: 6px 12px;
-    border-bottom: 1px solid #2f3146;
+    border-bottom: 1px solid var(--border);
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #1e1f2e;
+    background: var(--bg-secondary);
     min-height: 32px;
   }
 
@@ -209,12 +212,12 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #9ece6a;
+    color: var(--green);
   }
 
   .preview-file {
     font-size: 11px;
-    color: #565f89;
+    color: var(--text-muted);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

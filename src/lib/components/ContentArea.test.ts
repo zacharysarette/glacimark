@@ -53,14 +53,25 @@ vi.mock("@codemirror/state", () => ({
   StateEffect: {
     define: vi.fn().mockReturnValue({ of: vi.fn().mockReturnValue({ type: "setSearchText" }) }),
   },
+  Compartment: vi.fn().mockImplementation(function (this: any) {
+    this.of = vi.fn().mockReturnValue("themeCompartment");
+    this.reconfigure = vi.fn().mockReturnValue({ type: "reconfigure" });
+  }),
 }));
 
 vi.mock("@codemirror/lang-markdown", () => ({
   markdown: vi.fn().mockReturnValue("markdownLang"),
 }));
 
-vi.mock("@codemirror/theme-one-dark", () => ({
-  oneDark: "oneDarkTheme",
+vi.mock("@codemirror/language", () => ({
+  HighlightStyle: {
+    define: vi.fn().mockReturnValue("highlightStyle"),
+  },
+  syntaxHighlighting: vi.fn().mockReturnValue("syntaxHighlighting"),
+}));
+
+vi.mock("@lezer/highlight", () => ({
+  tags: new Proxy({}, { get: () => vi.fn().mockReturnValue("tag") }),
 }));
 
 vi.mock("codemirror", () => ({

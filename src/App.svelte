@@ -35,15 +35,19 @@
     getLayoutMode,
     saveOpenPanes,
     getOpenPanes,
+    saveTheme,
+    getTheme,
   } from "./lib/services/persistence";
+  import { setMermaidTheme, setBobDarkMode } from "./lib/services/markdown";
   import { findFirstFile, filterEntries } from "./lib/services/tree-utils";
   import { sortEntries, type SortMode } from "./lib/services/sort";
   import { resetDragSource } from "./lib/components/FileTreeItem.svelte";
-  import type { FileEntry, LayoutMode, OpenPane, SearchResult } from "./lib/types";
+  import type { FileEntry, LayoutMode, OpenPane, SearchResult, ThemeType } from "./lib/types";
 
   const MAX_PANES = 4;
   let nextPaneId = 1;
 
+  let theme: ThemeType = $state(getTheme());
   let rawTree: FileEntry[] = $state([]);
   let panes: OpenPane[] = $state([]);
   let activePaneId = $state("");
@@ -69,6 +73,18 @@
   const recentOwnWrites = new Set<string>();
   let suppressWatcherUntil = 0;
   let savedPaneBeforeHelp: { path: string; content: string; editMode?: boolean } | null = null;
+
+  // Apply theme to DOM and diagram renderers
+  $effect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    setMermaidTheme(theme);
+    setBobDarkMode(theme === "aurora");
+  });
+
+  function handleThemeToggle() {
+    theme = theme === "aurora" ? "glacier" : "aurora";
+    saveTheme(theme);
+  }
 
   let sortedTree: FileEntry[] = $derived(sortEntries(rawTree, sortMode));
   let tree: FileEntry[] = $derived(filterEntries(sortedTree, filterQuery));
@@ -802,8 +818,8 @@
 </script>
 
 <div class="app-layout">
-  <Sidebar entries={tree} {selectedPath} {selectedFolderPath} onselect={(path, event, lineContent) => handleSelect(path, event, lineContent)} onchangefolder={handleChangeFolder} {sortMode} onsortchange={handleSortChange} onhelp={handleHelp} {helpActive} {filterQuery} onfilterchange={handleFilterChange} {searchMode} onsearchmodechange={handleSearchModeChange} {searchResults} {searchQuery} onsearchchange={handleSearchChange} {isSearching} onnewfile={handleNewFile} onnewfolder={handleNewFolder} {creatingFile} {creatingFolder} oncreatenewfile={handleCreateNewFile} oncancelcreate={handleCancelCreate} oncreatenewfolder={handleCreateNewFolder} oncancelcreatefolder={handleCancelCreateFolder} {newFileError} {newFolderError} onfocuschange={handleFocusChange} onfolderselect={handleFolderSelect} onmovefile={handleMoveFile} {renamingPath} {renameError} onstartrename={handleStartRename} onconfirmrename={handleConfirmRename} oncancelrename={handleCancelRename} ondelete={handleDeleteFile} onsaveas={handleSaveAsForPath} {docsPath} />
-  <ContentArea {panes} {activePaneId} {layoutMode} onlayoutchange={handleLayoutChange} onclosepane={handleClosePane} onactivatepane={handleActivatePane} ontoggleedit={handleToggleEdit} onsave={handleSave} onsaveas={handleSaveAsFromPane} {highlightText} {highlightKey} />
+  <Sidebar entries={tree} {selectedPath} {selectedFolderPath} onselect={(path, event, lineContent) => handleSelect(path, event, lineContent)} onchangefolder={handleChangeFolder} {sortMode} onsortchange={handleSortChange} onhelp={handleHelp} {helpActive} {filterQuery} onfilterchange={handleFilterChange} {searchMode} onsearchmodechange={handleSearchModeChange} {searchResults} {searchQuery} onsearchchange={handleSearchChange} {isSearching} onnewfile={handleNewFile} onnewfolder={handleNewFolder} {creatingFile} {creatingFolder} oncreatenewfile={handleCreateNewFile} oncancelcreate={handleCancelCreate} oncreatenewfolder={handleCreateNewFolder} oncancelcreatefolder={handleCancelCreateFolder} {newFileError} {newFolderError} onfocuschange={handleFocusChange} onfolderselect={handleFolderSelect} onmovefile={handleMoveFile} {renamingPath} {renameError} onstartrename={handleStartRename} onconfirmrename={handleConfirmRename} oncancelrename={handleCancelRename} ondelete={handleDeleteFile} onsaveas={handleSaveAsForPath} {docsPath} {theme} onthemetoggle={handleThemeToggle} />
+  <ContentArea {panes} {activePaneId} {layoutMode} onlayoutchange={handleLayoutChange} onclosepane={handleClosePane} onactivatepane={handleActivatePane} ontoggleedit={handleToggleEdit} onsave={handleSave} onsaveas={handleSaveAsFromPane} {highlightText} {highlightKey} {theme} />
 </div>
 
 <style>

@@ -1,5 +1,5 @@
 import type { SortMode } from "./sort";
-import type { LayoutMode } from "../types";
+import type { LayoutMode, ThemeType } from "../types";
 
 const STORAGE_KEY = "polar-markdown:last-selected-path";
 const DOCS_FOLDER_KEY = "polar-markdown:docs-folder";
@@ -7,6 +7,7 @@ const SORT_MODE_KEY = "polar-markdown:sort-mode";
 const LAYOUT_MODE_KEY = "polar-markdown:layout-mode";
 const OPEN_PANES_KEY = "polar-markdown:open-panes";
 const EXPANDED_PATHS_KEY = "polar-markdown:expanded-paths";
+const THEME_KEY = "polar-markdown:theme";
 
 export function saveLastSelectedPath(path: string): void {
   localStorage.setItem(STORAGE_KEY, path);
@@ -66,4 +67,12 @@ export function getExpandedPaths(): string[] {
   } catch {
     return [];
   }
+}
+
+export function saveTheme(theme: ThemeType): void {
+  localStorage.setItem(THEME_KEY, theme);
+}
+
+export function getTheme(): ThemeType {
+  return (localStorage.getItem(THEME_KEY) as ThemeType) || "aurora";
 }
