@@ -22,6 +22,10 @@ export async function getHelpContent(): Promise<string> {
   return invoke<string>("get_help_content");
 }
 
+export async function getMuseumContent(): Promise<string> {
+  return invoke<string>("get_museum_content");
+}
+
 export async function renderAsciiDiagram(input: string, dark: boolean = true): Promise<string> {
   return invoke<string>("render_ascii_diagram", { input, dark });
 }

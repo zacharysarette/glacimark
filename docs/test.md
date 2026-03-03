@@ -2,6 +2,8 @@
 
 Welcome to **Polar Markdown** — your local markdown viewer with diagram support. This file showcases every rendering feature so you can verify they all work correctly.
 
+For more information about how the application works, see [How to Use Polar Markdown](<How to Use Polar Markdown.md>).
+
 ---
 
 ## Images
@@ -235,6 +237,33 @@ Content below the rule.
 
 ---
 
+## File Links (Cross-File Navigation)
+
+Clicking a `.md` link opens that file in the active pane. Ctrl+Click opens it in a new pane. Links with `#section` fragments open the file and scroll to the heading.
+
+- [Open the user guide](How to Use Polar Markdown.md) (should open in active pane)
+- [Open nextsteps](nextsteps.md) (relative file link)
+
+### External Links
+
+External `http://` and `https://` links open in your system browser instead of navigating the WebView:
+
+- [Polar Markdown on GitHub](https://github.com/zacharysarette/polar-markdown) (opens in browser)
+- [Example.com](https://example.com) (opens in browser)
+
+### Malformed Links
+
+These intentionally broken link syntaxes should render as plain text, not clickable links:
+
+- [Spaces in URL](How to Use Polar Markdown.md) — spaces break the URL per CommonMark spec
+- [Missing closing paren](test.md — no closing `)` on the URL
+- [Empty URL]() — empty destination
+- Just brackets with no parens: [not a link]
+
+To link to filenames with spaces, use angle brackets: `[link text](<file with spaces.md>)`.
+
+---
+
 ## Anchor Links (In-Page Navigation)
 
 Clicking a `#hash` link smooth-scrolls to the matching heading. Try these — each should visibly scroll since they jump across the full length of this document:
@@ -246,6 +275,7 @@ Clicking a `#hash` link smooth-scrolls to the matching heading. Try these — ea
 - [Jump to Tables](#tables)
 - [Jump to Text Formatting](#text-formatting)
 - [Back to top](#polar-markdown-rendering-museum)
+- [Back to User Guide](<How to Use Polar Markdown.md>) (opens the help guide)
 
 ---
 

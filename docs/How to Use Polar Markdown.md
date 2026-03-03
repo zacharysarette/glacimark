@@ -2,6 +2,8 @@
 
 Polar Markdown is a desktop markdown viewer with Mermaid diagram support. It lets you browse, read, and navigate markdown files with live-rendered diagrams.
 
+Want to see all the markdown features in action? Check out the [Rendering Museum](test.md) — it showcases every rendering capability in one place.
+
 ---
 
 ## Getting Started
@@ -99,6 +101,13 @@ You can delete markdown files directly from the sidebar:
 - A native OS confirmation dialog asks you to confirm before the file is removed
 - Any open panes showing the deleted file are automatically closed
 
+### Copy Path
+
+You can copy the full path of any file or folder to the clipboard:
+
+- **Right-click** a file or folder in the sidebar — the context menu includes a "Copy Path" option
+- The full file system path is copied to your clipboard
+
 ### Save As
 
 You can save a copy of any file under a new name or location:
@@ -151,6 +160,8 @@ The main content area renders your markdown with full formatting support:
 - **Code blocks** — syntax highlighted with highlight.js, with line numbers in the left gutter
 - **Links** — clickable
 - **Anchor links** — `#hash` links (e.g. `[Go to top](#top)`) smooth-scroll to the matching heading within the document. Tables of contents, cross-references, and "Back to top" links all work. Headings automatically get GitHub-flavored IDs (lowercased, spaces become hyphens, special characters stripped). Duplicate headings get `-1`, `-2` suffixes.
+- **File links** — clicking a `.md` link (e.g. `[see notes](notes.md)`) opens that file in the active pane. Ctrl+Click opens it in a new pane. Links with `#section` fragments (e.g. `guide.md#installation`) open the file and scroll to the heading. Relative paths (`../sibling/file.md`, `sub/deep.md`) are resolved correctly.
+- **External links** — clicking an `http://` or `https://` link opens it in your system browser instead of navigating inside the app
 - **Mermaid diagrams** — rendered as live SVG diagrams
 
 ### ASCII Art Diagrams (svgbob)
@@ -270,5 +281,5 @@ Polar Markdown watches your folder for changes in real time. If you edit a markd
 - **Widescreen monitors:** Use the layout toggle (top-right of the content area) to switch between centered and multi-column modes.
 - **Multiple folders:** Use the folder button to switch between different documentation directories. Each folder's state is independent.
 - **CLI usage:** After installing with the NSIS installer, run `polarmd` from any terminal to launch the app, or `polarmd file.md` to open a specific file.
-- **Rendering museum:** Open `docs/test.md` to see every rendering feature in one place — headings, code blocks, Mermaid diagrams, ASCII art, tables, images, anchor links, and more. Great for verifying everything works after updates.
+- **Rendering museum:** Open [the Rendering Museum](test.md) to see every rendering feature in one place — headings, code blocks, Mermaid diagrams, ASCII art, tables, images, anchor links, and more. Great for verifying everything works after updates.
 - **Dogfooding:** Polar Markdown's own documentation lives in the `docs/` folder — you're reading it right now!

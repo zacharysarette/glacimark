@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { listen } from "@tauri-apps/api/event";
   import Sidebar from "./lib/components/Sidebar.svelte";
   import ContentArea from "./lib/components/ContentArea.svelte";
@@ -10,6 +10,7 @@
     startWatching,
     getDocsPath,
     getHelpContent,
+    getMuseumContent,
     pickFolder,
     searchFiles,
     createFile,
@@ -79,6 +80,7 @@
   let focusedTreePath = $state("");
   let renamingPath = $state("");
   let renameError = $state("");
+  let scrollToId = $state("");
   const recentOwnWrites = new Set<string>();
   let suppressWatcherUntil = 0;
   let savedPaneBeforeHelp: { path: string; content: string; editMode?: boolean } | null = null;
@@ -160,6 +162,7 @@
     highlightText = lineContent ?? "";
     if (lineContent) highlightKey++;
     selectedFolderPath = "";
+    scrollToId = "";
     if (event?.ctrlKey && panes.length < MAX_PANES) {
       openInNewPane(path);
     } else {
@@ -659,6 +662,57 @@
     }
   }
 
+  /** Map of virtual filenames to their embedded content loaders. */
+  const EMBEDDED_DOCS: Record<string, () => Promise<string>> = {
+    "How to Use Polar Markdown.md": getHelpContent,
+    "test.md": getMuseumContent,
+  };
+
+  async function handleFileLink(path: string, hash?: string, ctrlKey?: boolean) {
+    scrollToId = "";
+
+    // When navigating from a read-only (embedded) pane, check for embedded targets
+    const activePane = panes.find((p) => p.id === activePaneId);
+    if (activePane?.readOnly) {
+      const filename = path.split("/").pop() ?? path;
+      const loader = EMBEDDED_DOCS[filename];
+      if (loader) {
+        const content = await loader();
+        if (ctrlKey && panes.length < MAX_PANES) {
+          const id = createPaneId();
+          panes = [...panes, { id, path: filename, content, readOnly: true, editMode: false }];
+          activePaneId = id;
+        } else {
+          panes = panes.map((p) =>
+            p.id === activePaneId
+              ? { ...p, path: filename, content, readOnly: true, editMode: false }
+              : p
+          );
+        }
+        if (hash) {
+          await tick();
+          scrollToId = hash;
+        }
+        return;
+      }
+    }
+
+    // Normal file link handling (reads from disk)
+    if (ctrlKey && panes.length < MAX_PANES) {
+      await openInNewPane(path);
+    } else {
+      await openInActivePane(path);
+    }
+    if (hash) {
+      await tick();
+      scrollToId = hash;
+    }
+  }
+
+  function handleCopyPath(path: string) {
+    navigator.clipboard.writeText(path);
+  }
+
   function handleKeyDown(event: KeyboardEvent) {
     // Escape: reset drag state (mitigates Windows 11 WebView2 stuck-drag bug)
     if (event.key === "Escape") {
@@ -833,8 +887,8 @@
 </script>
 
 <div class="app-layout">
-  <Sidebar entries={tree} {selectedPath} {selectedFolderPath} onselect={(path, event, lineContent) => handleSelect(path, event, lineContent)} onchangefolder={handleChangeFolder} {sortMode} onsortchange={handleSortChange} onhelp={handleHelp} {helpActive} {filterQuery} onfilterchange={handleFilterChange} {searchMode} onsearchmodechange={handleSearchModeChange} {searchResults} {searchQuery} onsearchchange={handleSearchChange} {isSearching} onnewfile={handleNewFile} onnewfolder={handleNewFolder} {creatingFile} {creatingFolder} oncreatenewfile={handleCreateNewFile} oncancelcreate={handleCancelCreate} oncreatenewfolder={handleCreateNewFolder} oncancelcreatefolder={handleCancelCreateFolder} {newFileError} {newFolderError} onfocuschange={handleFocusChange} onfolderselect={handleFolderSelect} onmovefile={handleMoveFile} {renamingPath} {renameError} onstartrename={handleStartRename} onconfirmrename={handleConfirmRename} oncancelrename={handleCancelRename} ondelete={handleDeleteFile} onsaveas={handleSaveAsForPath} {docsPath} {theme} onthemetoggle={handleThemeToggle} />
-  <ContentArea {panes} {activePaneId} {layoutMode} onlayoutchange={handleLayoutChange} onclosepane={handleClosePane} onactivatepane={handleActivatePane} ontoggleedit={handleToggleEdit} onsave={handleSave} onsaveas={handleSaveAsFromPane} {highlightText} {highlightKey} {theme} />
+  <Sidebar entries={tree} {selectedPath} {selectedFolderPath} onselect={(path, event, lineContent) => handleSelect(path, event, lineContent)} onchangefolder={handleChangeFolder} {sortMode} onsortchange={handleSortChange} onhelp={handleHelp} {helpActive} {filterQuery} onfilterchange={handleFilterChange} {searchMode} onsearchmodechange={handleSearchModeChange} {searchResults} {searchQuery} onsearchchange={handleSearchChange} {isSearching} onnewfile={handleNewFile} onnewfolder={handleNewFolder} {creatingFile} {creatingFolder} oncreatenewfile={handleCreateNewFile} oncancelcreate={handleCancelCreate} oncreatenewfolder={handleCreateNewFolder} oncancelcreatefolder={handleCancelCreateFolder} {newFileError} {newFolderError} onfocuschange={handleFocusChange} onfolderselect={handleFolderSelect} onmovefile={handleMoveFile} {renamingPath} {renameError} onstartrename={handleStartRename} onconfirmrename={handleConfirmRename} oncancelrename={handleCancelRename} ondelete={handleDeleteFile} onsaveas={handleSaveAsForPath} {docsPath} {theme} onthemetoggle={handleThemeToggle} oncopypath={handleCopyPath} />
+  <ContentArea {panes} {activePaneId} {layoutMode} onlayoutchange={handleLayoutChange} onclosepane={handleClosePane} onactivatepane={handleActivatePane} ontoggleedit={handleToggleEdit} onsave={handleSave} onsaveas={handleSaveAsFromPane} {highlightText} {highlightKey} {theme} onfilelink={handleFileLink} {scrollToId} />
 </div>
 
 <style>

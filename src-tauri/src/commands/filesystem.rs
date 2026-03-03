@@ -8,6 +8,9 @@ use walkdir::WalkDir;
 /// Help file content embedded at compile time — always available regardless of install location.
 const HELP_CONTENT: &str = include_str!("../../../docs/How to Use Polar Markdown.md");
 
+/// Museum file content embedded at compile time — available for help-flow navigation.
+const MUSEUM_CONTENT: &str = include_str!("../../../docs/test.md");
+
 /// Recursively reads a directory tree, filtering to .md files and directories
 /// that contain .md files. Skips hidden directories.
 /// Returns entries sorted: directories first, then alphabetical.
@@ -411,6 +414,12 @@ pub fn get_initial_file(state: tauri::State<'_, crate::InitialFileState>) -> Opt
 #[tauri::command]
 pub fn get_help_content() -> String {
     HELP_CONTENT.to_string()
+}
+
+/// Returns the embedded rendering museum content (compiled into the binary).
+#[tauri::command]
+pub fn get_museum_content() -> String {
+    MUSEUM_CONTENT.to_string()
 }
 
 /// Searches the contents of all .md files in a directory for a query string.

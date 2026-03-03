@@ -45,6 +45,7 @@ pub fn run() {
         .manage(WatcherState(Mutex::new(None)))
         .manage(InitialFileState(Mutex::new(None)))
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
             // Second instance launched — extract file arg and emit event to existing window
             if let Some(file_path) = extract_file_arg(&args) {
@@ -94,6 +95,7 @@ pub fn run() {
             commands::filesystem::write_file_contents,
             commands::filesystem::get_docs_path,
             commands::filesystem::get_help_content,
+            commands::filesystem::get_museum_content,
             commands::filesystem::search_files,
             commands::filesystem::create_file,
             commands::filesystem::rename_file,
