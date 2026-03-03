@@ -11,6 +11,15 @@ mermaid.initialize({
   securityLevel: "loose",
 });
 
+/** Switch mermaid between dark/light themes. Call when app theme changes. */
+export function setMermaidTheme(themeType: "aurora" | "glacier"): void {
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: themeType === "aurora" ? "dark" : "default",
+    securityLevel: "loose",
+  });
+}
+
 // Unicode characters that unambiguously indicate an ASCII art diagram
 const DIAGRAM_CHARS = /[─│┌┐└┘├┤┬┴┼═║╔╗╚╝╠╣╦╩╬╭╮╰╯→←↑↓┊┆]/;
 
@@ -62,6 +71,14 @@ export function resolveImageSrc(href: string, markdownDir: string): string {
 
 // Track the current markdown file's directory for image resolution
 let currentMarkdownDir = "";
+
+// Track whether to use dark or light theme for svgbob diagrams
+let bobDarkMode = true;
+
+/** Set svgbob dark mode. Called when app theme changes. */
+export function setBobDarkMode(dark: boolean): void {
+  bobDarkMode = dark;
+}
 
 function wrapWithLineNumbers(highlighted: string, text: string, langClass: string): string {
   const lineCount = text.endsWith('\n') ? text.split('\n').length - 1 : text.split('\n').length;
@@ -130,7 +147,7 @@ export async function renderBobDiagrams(): Promise<void> {
     const text = el.textContent ?? "";
     if (!text.trim()) continue;
     try {
-      const svg = await renderAsciiDiagram(text);
+      const svg = await renderAsciiDiagram(text, bobDarkMode);
       el.innerHTML = svg;
       el.classList.remove("bob");
       el.classList.add("bob-rendered");

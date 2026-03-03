@@ -335,6 +335,38 @@ describe("Sidebar", () => {
     expect(onsaveas).toHaveBeenCalledWith("/docs/test.md");
   });
 
+  it("renders theme toggle button when onthemetoggle is provided", () => {
+    render(Sidebar, {
+      props: { entries: [], selectedPath: "", onselect: vi.fn(), theme: "aurora", onthemetoggle: vi.fn() },
+    });
+
+    const btn = screen.getByTitle("Switch to Glacier (light)");
+    expect(btn).toBeInTheDocument();
+    expect(btn.textContent?.trim()).toContain("☀️");
+  });
+
+  it("shows moon emoji when theme is glacier", () => {
+    render(Sidebar, {
+      props: { entries: [], selectedPath: "", onselect: vi.fn(), theme: "glacier", onthemetoggle: vi.fn() },
+    });
+
+    const btn = screen.getByTitle("Switch to Aurora (dark)");
+    expect(btn).toBeInTheDocument();
+    expect(btn.textContent?.trim()).toContain("🌙");
+  });
+
+  it("calls onthemetoggle when theme button is clicked", async () => {
+    const onthemetoggle = vi.fn();
+    render(Sidebar, {
+      props: { entries: [], selectedPath: "", onselect: vi.fn(), theme: "aurora", onthemetoggle },
+    });
+
+    const btn = screen.getByTitle("Switch to Glacier (light)");
+    await fireEvent.click(btn);
+
+    expect(onthemetoggle).toHaveBeenCalledOnce();
+  });
+
   it("shows search results instead of file tree when searchMode is active with a query", () => {
     const searchResults = [
       { path: "/docs/readme.md", name: "readme.md", matches: [{ line_number: 1, line_content: "# README" }] },

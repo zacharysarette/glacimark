@@ -289,26 +289,26 @@
     right: 8px;
     top: 50%;
     height: 2px;
-    background: #9ece6a;
+    background: var(--green);
     border-radius: 1px;
     transform: translateY(-50%);
   }
 
   .empty {
     padding: 16px;
-    color: #565f89;
+    color: var(--text-muted);
     font-size: 13px;
     font-style: italic;
   }
 
   .context-menu {
     position: fixed;
-    background: #1e1f2e;
-    border: 1px solid #2f3146;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 4px 0;
     min-width: 120px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 12px var(--shadow);
     z-index: 1000;
   }
 
@@ -318,7 +318,7 @@
     padding: 6px 16px;
     border: none;
     background: none;
-    color: #c0caf5;
+    color: var(--text-primary);
     font-size: 13px;
     font-family: inherit;
     text-align: left;
@@ -326,12 +326,12 @@
   }
 
   .context-menu-item:hover {
-    background: rgba(122, 162, 247, 0.15);
-    color: #7aa2f7;
+    background: var(--accent-bg);
+    color: var(--accent);
   }
 
   .context-menu-item.delete:hover {
-    background: rgba(247, 118, 142, 0.15);
-    color: #f7768e;
+    background: var(--red-bg);
+    color: var(--red);
   }
 </style>

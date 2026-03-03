@@ -8,6 +8,8 @@ export interface FileEntry {
 
 export type LayoutMode = "centered" | "columns";
 
+export type ThemeType = "aurora" | "glacier";
+
 export interface OpenPane {
   id: string;
   path: string;

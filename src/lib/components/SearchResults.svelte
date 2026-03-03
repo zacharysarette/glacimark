@@ -44,7 +44,7 @@
 
   .no-results {
     padding: 16px;
-    color: #565f89;
+    color: var(--text-muted);
     font-size: 13px;
     font-style: italic;
   }
@@ -61,7 +61,7 @@
     padding: 6px 12px;
     border: none;
     background: none;
-    color: #7aa2f7;
+    color: var(--accent);
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
@@ -70,13 +70,13 @@
   }
 
   .result-file:hover {
-    background: rgba(122, 162, 247, 0.1);
+    background: var(--accent-hover);
   }
 
   .match-count {
     font-size: 11px;
     font-weight: 400;
-    color: #565f89;
+    color: var(--text-muted);
     flex-shrink: 0;
   }
 
@@ -91,7 +91,7 @@
     padding: 2px 12px;
     border: none;
     background: none;
-    color: #a9b1d6;
+    color: var(--text-secondary);
     font-size: 12px;
     cursor: pointer;
     text-align: left;
@@ -99,11 +99,11 @@
   }
 
   .result-line:hover {
-    background: rgba(122, 162, 247, 0.08);
+    background: var(--accent-focus);
   }
 
   .line-number {
-    color: #565f89;
+    color: var(--text-muted);
     flex-shrink: 0;
     min-width: 24px;
   }

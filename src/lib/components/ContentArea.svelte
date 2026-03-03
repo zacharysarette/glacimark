@@ -1,7 +1,7 @@
 <script lang="ts">
   import MarkdownViewer from "./MarkdownViewer.svelte";
   import EditablePane from "./EditablePane.svelte";
-  import type { OpenPane, LayoutMode } from "../types";
+  import type { OpenPane, LayoutMode, ThemeType } from "../types";
 
   let {
     panes = [],
@@ -15,6 +15,7 @@
     onsaveas,
     highlightText = "",
     highlightKey = 0,
+    theme = "aurora" as ThemeType,
   }: {
     panes?: OpenPane[];
     activePaneId?: string;
@@ -27,6 +28,7 @@
     onsaveas?: (id: string) => void;
     highlightText?: string;
     highlightKey?: number;
+    theme?: ThemeType;
   } = $props();
 
   let copiedPaneId = $state("");
@@ -40,7 +42,7 @@
 
 {#if panes.length === 0}
   <div class="empty-state" role="main" aria-label="Markdown viewer">
-    <div class="empty-icon">📝</div>
+    <div class="empty-icon">🐻‍❄️</div>
     <h2>Polar Markdown</h2>
     <p>Select a markdown file from the sidebar to view it.</p>
   </div>
@@ -118,6 +120,7 @@
             {onsave}
             highlightText={pane.id === activePaneId ? highlightText : ""}
             highlightKey={pane.id === activePaneId ? highlightKey : 0}
+            {theme}
           />
         {:else}
           <MarkdownViewer
@@ -146,7 +149,7 @@
     flex-direction: column;
     height: 100%;
     overflow: hidden;
-    border-left: 1px solid #2f3146;
+    border-left: 1px solid var(--border);
   }
 
   .pane:first-child {
@@ -155,21 +158,21 @@
 
   .pane-header {
     padding: 8px 12px;
-    border-bottom: 1px solid #2f3146;
+    border-bottom: 1px solid var(--border);
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #1a1b26;
+    background: var(--bg-primary);
   }
 
   .pane.active .pane-header {
-    background: #1e1f2e;
+    background: var(--bg-secondary);
   }
 
   .pane-filename {
     font-size: 12px;
-    color: #565f89;
+    color: var(--text-muted);
     font-weight: 500;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -177,7 +180,7 @@
   }
 
   .pane.active .pane-filename {
-    color: #7aa2f7;
+    color: var(--accent);
   }
 
   .pane-actions {
@@ -189,7 +192,7 @@
 
   .mode-toggle {
     display: flex;
-    border: 1px solid #2f3146;
+    border: 1px solid var(--border);
     border-radius: 4px;
     overflow: hidden;
   }
@@ -197,7 +200,7 @@
   .mode-btn {
     background: none;
     border: none;
-    color: #565f89;
+    color: var(--text-muted);
     cursor: pointer;
     padding: 3px 6px;
     display: flex;
@@ -206,17 +209,17 @@
   }
 
   .mode-btn:first-child {
-    border-right: 1px solid #2f3146;
+    border-right: 1px solid var(--border);
   }
 
   .mode-btn:hover {
-    color: #7aa2f7;
-    background: rgba(122, 162, 247, 0.1);
+    color: var(--accent);
+    background: var(--accent-hover);
   }
 
   .mode-btn.mode-active {
-    color: #7aa2f7;
-    background: rgba(122, 162, 247, 0.15);
+    color: var(--accent);
+    background: var(--accent-bg);
   }
 
   .read-only-badge {
@@ -224,9 +227,9 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #e0af68;
-    background: rgba(224, 175, 104, 0.12);
-    border: 1px solid rgba(224, 175, 104, 0.3);
+    color: var(--yellow);
+    background: var(--yellow-bg);
+    border: 1px solid var(--yellow-glow);
     border-radius: 4px;
     padding: 2px 8px;
     line-height: 1;
@@ -235,7 +238,7 @@
   .save-as-btn {
     background: none;
     border: none;
-    color: #565f89;
+    color: var(--text-muted);
     cursor: pointer;
     padding: 3px 4px;
     border-radius: 4px;
@@ -246,14 +249,14 @@
   }
 
   .save-as-btn:hover {
-    color: #7aa2f7;
-    background: rgba(122, 162, 247, 0.1);
+    color: var(--accent);
+    background: var(--accent-hover);
   }
 
   .copy-path-btn {
     background: none;
     border: none;
-    color: #565f89;
+    color: var(--text-muted);
     cursor: pointer;
     padding: 3px 4px;
     border-radius: 4px;
@@ -264,14 +267,14 @@
   }
 
   .copy-path-btn:hover {
-    color: #7aa2f7;
-    background: rgba(122, 162, 247, 0.1);
+    color: var(--accent);
+    background: var(--accent-hover);
   }
 
   .close-btn {
     background: none;
     border: none;
-    color: #565f89;
+    color: var(--text-muted);
     cursor: pointer;
     font-size: 16px;
     line-height: 1;
@@ -281,8 +284,8 @@
   }
 
   .close-btn:hover {
-    color: #f7768e;
-    background: rgba(247, 118, 142, 0.1);
+    color: var(--red);
+    background: var(--red-hover);
   }
 
   .empty-state {
@@ -291,7 +294,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #565f89;
+    color: var(--text-muted);
     gap: 12px;
   }
 
@@ -300,7 +303,7 @@
   }
 
   .empty-state h2 {
-    color: #7aa2f7;
+    color: var(--accent);
     font-size: 24px;
   }
 

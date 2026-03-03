@@ -1,19 +1,37 @@
-/* Polar Markdown - Dark Theme (Catppuccin-inspired) */
+/* Polar Markdown - Aurora Theme (Dark) */
 
 :root {
   --bg-primary: #1a1b26;
   --bg-secondary: #1e1f2e;
   --bg-elevated: #24253a;
+  --bg-input: #16172b;
   --border: #2f3146;
   --text-primary: #c0caf5;
   --text-secondary: #a9b1d6;
   --text-muted: #565f89;
   --accent: #7aa2f7;
+  --accent-hover: rgba(122, 162, 247, 0.1);
+  --accent-active: rgba(122, 162, 247, 0.2);
+  --accent-focus: rgba(122, 162, 247, 0.08);
+  --accent-bg: rgba(122, 162, 247, 0.15);
+  --accent-outline: rgba(122, 162, 247, 0.5);
   --green: #9ece6a;
+  --green-hover: rgba(158, 206, 106, 0.1);
+  --green-active: rgba(158, 206, 106, 0.15);
+  --green-strong: rgba(158, 206, 106, 0.25);
+  --green-outline: rgba(158, 206, 106, 0.4);
   --yellow: #e0af68;
+  --yellow-bg: rgba(224, 175, 104, 0.12);
+  --yellow-highlight: rgba(224, 175, 104, 0.4);
+  --yellow-outline: rgba(224, 175, 104, 0.6);
+  --yellow-glow: rgba(224, 175, 104, 0.15);
   --red: #f7768e;
+  --red-hover: rgba(247, 118, 142, 0.1);
+  --red-bg: rgba(247, 118, 142, 0.15);
   --purple: #bb9af7;
   --cyan: #7dcfff;
+  --shadow: rgba(0, 0, 0, 0.4);
+  --tr-even: rgba(36, 37, 58, 0.5);
 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, sans-serif;
@@ -21,6 +39,85 @@
   background-color: var(--bg-primary);
   font-size: 15px;
   line-height: 1.6;
+}
+
+/* Glacier Theme (Light) */
+[data-theme="glacier"] {
+  --bg-primary: #f4f7fb;
+  --bg-secondary: #e8eef5;
+  --bg-elevated: #dce4ed;
+  --bg-input: #ffffff;
+  --border: #c0cdd8;
+  --text-primary: #2e3440;
+  --text-secondary: #3b4252;
+  --text-muted: #6b7d8e;
+  --accent: #4a8dbf;
+  --accent-hover: rgba(74, 141, 191, 0.1);
+  --accent-active: rgba(74, 141, 191, 0.2);
+  --accent-focus: rgba(74, 141, 191, 0.08);
+  --accent-bg: rgba(74, 141, 191, 0.15);
+  --accent-outline: rgba(74, 141, 191, 0.5);
+  --green: #5a9e6f;
+  --green-hover: rgba(90, 158, 111, 0.1);
+  --green-active: rgba(90, 158, 111, 0.15);
+  --green-strong: rgba(90, 158, 111, 0.25);
+  --green-outline: rgba(90, 158, 111, 0.4);
+  --yellow: #c49030;
+  --yellow-bg: rgba(196, 144, 48, 0.12);
+  --yellow-highlight: rgba(196, 144, 48, 0.35);
+  --yellow-outline: rgba(196, 144, 48, 0.6);
+  --yellow-glow: rgba(196, 144, 48, 0.15);
+  --red: #b94e5a;
+  --red-hover: rgba(185, 78, 90, 0.1);
+  --red-bg: rgba(185, 78, 90, 0.15);
+  --purple: #8b6f9e;
+  --cyan: #4a8dbf;
+  --shadow: rgba(0, 0, 0, 0.15);
+  --tr-even: rgba(220, 228, 237, 0.5);
+}
+
+/* Glacier highlight.js overrides */
+[data-theme="glacier"] .hljs {
+  color: #2e3440;
+  background: #dce4ed;
+}
+[data-theme="glacier"] .hljs-keyword,
+[data-theme="glacier"] .hljs-selector-tag,
+[data-theme="glacier"] .hljs-literal,
+[data-theme="glacier"] .hljs-section,
+[data-theme="glacier"] .hljs-link {
+  color: #4a8dbf;
+}
+[data-theme="glacier"] .hljs-string,
+[data-theme="glacier"] .hljs-title,
+[data-theme="glacier"] .hljs-name,
+[data-theme="glacier"] .hljs-type,
+[data-theme="glacier"] .hljs-attribute,
+[data-theme="glacier"] .hljs-symbol,
+[data-theme="glacier"] .hljs-bullet,
+[data-theme="glacier"] .hljs-addition,
+[data-theme="glacier"] .hljs-variable,
+[data-theme="glacier"] .hljs-template-tag,
+[data-theme="glacier"] .hljs-template-variable {
+  color: #5a9e6f;
+}
+[data-theme="glacier"] .hljs-comment,
+[data-theme="glacier"] .hljs-quote,
+[data-theme="glacier"] .hljs-deletion,
+[data-theme="glacier"] .hljs-meta {
+  color: #6b7d8e;
+}
+[data-theme="glacier"] .hljs-number,
+[data-theme="glacier"] .hljs-regexp,
+[data-theme="glacier"] .hljs-built_in,
+[data-theme="glacier"] .hljs-params {
+  color: #c49030;
+}
+[data-theme="glacier"] .hljs-emphasis {
+  font-style: italic;
+}
+[data-theme="glacier"] .hljs-strong {
+  font-weight: bold;
 }
 
 * {
@@ -177,7 +274,7 @@ html, body, #app {
 }
 
 .markdown-body tr:nth-child(even) {
-  background: rgba(36, 37, 58, 0.5);
+  background: var(--tr-even);
 }
 
 .markdown-body hr {
@@ -273,7 +370,7 @@ pre.line-numbers {
 
 .line-numbers-rows > span::before {
   content: counter(linenumber);
-  color: #565f89;
+  color: var(--text-muted);
   display: block;
   padding-right: 0.8em;
   text-align: right;
@@ -281,8 +378,8 @@ pre.line-numbers {
 
 /* Search result highlight — inline text match */
 mark.search-highlight {
-  background: rgba(224, 175, 104, 0.4);
-  color: #e0af68;
+  background: var(--yellow-highlight);
+  color: var(--yellow);
   border-radius: 2px;
   padding: 1px 2px;
   animation: highlight-fade 3s ease-out forwards;
@@ -290,42 +387,42 @@ mark.search-highlight {
 
 /* Search result highlight — element-level (for syntax-highlighted code blocks) */
 .search-highlight-line {
-  outline: 2px solid rgba(224, 175, 104, 0.6);
+  outline: 2px solid var(--yellow-outline);
   outline-offset: 2px;
   border-radius: 4px;
-  background: rgba(224, 175, 104, 0.1) !important;
+  background: var(--yellow-glow) !important;
   animation: highlight-line-fade 3s ease-out forwards;
 }
 
 @keyframes highlight-fade {
-  0% { background: rgba(224, 175, 104, 0.5); }
-  70% { background: rgba(224, 175, 104, 0.4); }
-  100% { background: rgba(224, 175, 104, 0.15); }
+  0% { background: var(--yellow-highlight); }
+  70% { background: var(--yellow-highlight); }
+  100% { background: var(--yellow-glow); }
 }
 
 @keyframes highlight-line-fade {
-  0% { outline-color: rgba(224, 175, 104, 0.6); background: rgba(224, 175, 104, 0.15) !important; }
-  70% { outline-color: rgba(224, 175, 104, 0.5); background: rgba(224, 175, 104, 0.1) !important; }
-  100% { outline-color: rgba(224, 175, 104, 0.15); background: rgba(224, 175, 104, 0.05) !important; }
+  0% { outline-color: var(--yellow-outline); background: var(--yellow-glow) !important; }
+  70% { outline-color: var(--yellow-outline); background: var(--yellow-glow) !important; }
+  100% { outline-color: var(--yellow-glow); background: var(--yellow-focus, rgba(224, 175, 104, 0.05)) !important; }
 }
 
 /* Search result highlight — code block line overlay */
 .search-line-overlay {
-  background: rgba(224, 175, 104, 0.2);
-  border-left: 3px solid #e0af68;
+  background: var(--yellow-active, rgba(224, 175, 104, 0.2));
+  border-left: 3px solid var(--yellow);
   animation: line-overlay-fade 3s ease-out forwards;
 }
 
 @keyframes line-overlay-fade {
-  0% { background: rgba(224, 175, 104, 0.25); border-left-color: #e0af68; }
-  70% { background: rgba(224, 175, 104, 0.15); border-left-color: rgba(224, 175, 104, 0.7); }
-  100% { background: rgba(224, 175, 104, 0.05); border-left-color: rgba(224, 175, 104, 0.3); }
+  0% { background: var(--yellow-active, rgba(224, 175, 104, 0.25)); border-left-color: var(--yellow); }
+  70% { background: var(--yellow-glow); border-left-color: var(--yellow); }
+  100% { background: var(--yellow-focus, rgba(224, 175, 104, 0.05)); border-left-color: var(--yellow-glow); }
 }
 
 /* Active line highlight — block-level blue background in preview when editing */
 .active-line-block {
-  background: rgba(122, 162, 247, 0.12) !important;
-  outline: 2px solid rgba(122, 162, 247, 0.4);
+  background: var(--accent-focus) !important;
+  outline: 2px solid var(--accent-outline);
   outline-offset: -2px;
   border-radius: 2px;
   transition: background 0.15s ease, outline-color 0.15s ease;
@@ -333,21 +430,21 @@ mark.search-highlight {
 
 /* Active line highlight — single line within a code block */
 .active-line-overlay {
-  background: rgba(122, 162, 247, 0.15);
-  border-left: 3px solid rgba(122, 162, 247, 0.5);
+  background: var(--accent-bg);
+  border-left: 3px solid var(--accent-outline);
 }
 
 /* Search highlight — block-level fallback when text spans multiple elements */
 .search-highlight-block {
-  background: rgba(224, 175, 104, 0.15) !important;
-  border-left: 3px solid rgba(224, 175, 104, 0.6);
+  background: var(--yellow-glow) !important;
+  border-left: 3px solid var(--yellow-outline);
   padding-left: 8px;
   border-radius: 2px;
   animation: block-highlight-fade 3s ease-out forwards;
 }
 
 @keyframes block-highlight-fade {
-  0% { background: rgba(224, 175, 104, 0.2) !important; border-left-color: rgba(224, 175, 104, 0.7); }
-  70% { background: rgba(224, 175, 104, 0.15) !important; border-left-color: rgba(224, 175, 104, 0.5); }
-  100% { background: rgba(224, 175, 104, 0.08) !important; border-left-color: rgba(224, 175, 104, 0.3); }
+  0% { background: var(--yellow-active, rgba(224, 175, 104, 0.2)) !important; border-left-color: var(--yellow-outline); }
+  70% { background: var(--yellow-glow) !important; border-left-color: var(--yellow-outline); }
+  100% { background: var(--yellow-focus, rgba(224, 175, 104, 0.08)) !important; border-left-color: var(--yellow-glow); }
 }

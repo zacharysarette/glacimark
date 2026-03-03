@@ -22,8 +22,8 @@ export async function getHelpContent(): Promise<string> {
   return invoke<string>("get_help_content");
 }
 
-export async function renderAsciiDiagram(input: string): Promise<string> {
-  return invoke<string>("render_ascii_diagram", { input });
+export async function renderAsciiDiagram(input: string, dark: boolean = true): Promise<string> {
+  return invoke<string>("render_ascii_diagram", { input, dark });
 }
 
 export async function searchFiles(path: string, query: string): Promise<SearchResult[]> {
@@ -90,6 +90,10 @@ export async function saveFileAs(currentPath: string, content: string): Promise<
   if (!newPath) return null;
   await writeFileContents(newPath, content);
   return newPath;
+}
+
+export async function saveThemeFile(theme: string): Promise<void> {
+  await invoke("save_theme", { theme });
 }
 
 export async function pickFolder(): Promise<string | null> {
