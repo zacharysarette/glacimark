@@ -23,17 +23,27 @@
     onsearchchange,
     isSearching = false,
     onnewfile,
+    onnewfolder,
     creatingFile = false,
+    creatingFolder = false,
     oncreatenewfile,
     oncancelcreate,
+    oncreatenewfolder,
+    oncancelcreatefolder,
     newFileError = "",
+    newFolderError = "",
+    selectedFolderPath = "",
     onfocuschange,
+    onfolderselect,
+    onmovefile,
     renamingPath = "",
     renameError = "",
     onstartrename,
     onconfirmrename,
     oncancelrename,
     ondelete,
+    onsaveas,
+    docsPath = "",
   }: {
     entries: FileEntry[];
     selectedPath?: string;
@@ -52,17 +62,27 @@
     onsearchchange?: (query: string) => void;
     isSearching?: boolean;
     onnewfile?: () => void;
+    onnewfolder?: () => void;
     creatingFile?: boolean;
+    creatingFolder?: boolean;
     oncreatenewfile?: (filename: string) => void;
     oncancelcreate?: () => void;
+    oncreatenewfolder?: (name: string) => void;
+    oncancelcreatefolder?: () => void;
     newFileError?: string;
+    newFolderError?: string;
+    selectedFolderPath?: string;
     onfocuschange?: (path: string) => void;
+    onfolderselect?: (path: string) => void;
+    onmovefile?: (sourcePath: string, targetDir: string) => void;
     renamingPath?: string;
     renameError?: string;
     onstartrename?: (path: string) => void;
     onconfirmrename?: (oldPath: string, newName: string) => void;
     oncancelrename?: () => void;
     ondelete?: (path: string) => void;
+    onsaveas?: (path: string) => void;
+    docsPath?: string;
   } = $props();
 
   const sortLabels: Record<SortMode, string> = {
@@ -78,11 +98,18 @@
   }
 
   let newFilename = $state("untitled.md");
+  let newFolderName = $state("new-folder");
 
   // Reset filename before DOM update so input mounts with correct value
   $effect.pre(() => {
     if (creatingFile) {
       newFilename = "untitled.md";
+    }
+  });
+
+  $effect.pre(() => {
+    if (creatingFolder) {
+      newFolderName = "new-folder";
     }
   });
 
@@ -103,6 +130,21 @@
     }
   }
 
+  function handleNewFolderKeyDown(event: KeyboardEvent) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      oncreatenewfolder?.(newFolderName);
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      oncancelcreatefolder?.();
+    }
+  }
+
+  function autofocusSelectAll(node: HTMLInputElement) {
+    node.focus();
+    node.select();
+  }
+
   function handleSearchSelect(path: string, lineContent?: string) {
     onselect(path, undefined, lineContent);
   }
@@ -110,10 +152,12 @@
 
 <aside class="sidebar" aria-label="File browser">
   <header class="sidebar-header">
-    <h2>Files</h2>
     <div class="header-actions">
       {#if onnewfile}
         <button class="new-file-btn" onclick={onnewfile} title="New file">+</button>
+      {/if}
+      {#if onnewfolder}
+        <button class="new-folder-btn" onclick={onnewfolder} title="New folder">📁+</button>
       {/if}
       {#if onsortchange}
         <button class="sort-btn" onclick={onsortchange} title="Sort files">
@@ -174,6 +218,9 @@
   {:else}
     {#if creatingFile}
       <div class="new-file-input">
+        {#if selectedFolderPath}
+          <span class="create-target-hint">in {selectedFolderPath.split(/[\\/]/).pop()}/</span>
+        {/if}
         <div class="new-file-row">
           <input
             type="text"
@@ -195,11 +242,43 @@
         {/if}
       </div>
     {/if}
+    {#if creatingFolder}
+      <div class="new-file-input">
+        {#if selectedFolderPath}
+          <span class="create-target-hint">in {selectedFolderPath.split(/[\\/]/).pop()}/</span>
+        {/if}
+        <div class="new-file-row">
+          <span class="folder-hint-icon">📁</span>
+          <input
+            type="text"
+            bind:value={newFolderName}
+            onkeydown={handleNewFolderKeyDown}
+            class="filter-input"
+            placeholder="folder name"
+            data-testid="new-folder-input"
+            use:autofocusSelectAll
+          />
+          <button
+            class="create-file-btn"
+            onclick={() => oncreatenewfolder?.(newFolderName)}
+            title="Create folder"
+          >✓</button>
+        </div>
+        {#if newFolderError}
+          <p class="new-file-error" role="alert">{newFolderError}</p>
+        {/if}
+      </div>
+    {/if}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-    <nav class="sidebar-content" onclick={handleNavClick}>
-      <FileTree {entries} {selectedPath} {onselect} {onfocuschange} {renamingPath} {renameError} {onstartrename} {onconfirmrename} {oncancelrename} {ondelete} />
+    <nav class="sidebar-content" onclick={handleNavClick} ondragover={(e) => e.preventDefault()} ondrop={(e) => e.preventDefault()}>
+      <FileTree {entries} {selectedPath} {selectedFolderPath} {onselect} {onfocuschange} {onfolderselect} {onmovefile} {renamingPath} {renameError} {onstartrename} {onconfirmrename} {oncancelrename} {ondelete} {onsaveas} />
     </nav>
+  {/if}
+  {#if docsPath}
+    <div class="folder-path" title={docsPath}>
+      {docsPath.split(/[\\/]/).pop() ?? docsPath}
+    </div>
   {/if}
 </aside>
 
@@ -220,14 +299,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-  }
-
-  .sidebar-header h2 {
-    font-size: 14px;
-    font-weight: 600;
-    color: #7aa2f7;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
   }
 
   .header-actions {
@@ -296,6 +367,17 @@
   .change-folder-btn:hover {
     background: rgba(122, 162, 247, 0.1);
     border-color: #7aa2f7;
+  }
+
+  .folder-path {
+    padding: 8px 16px;
+    font-size: 11px;
+    color: #565f89;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border-top: 1px solid #2f3146;
   }
 
   .filter-bar {
@@ -381,6 +463,35 @@
     background: rgba(122, 162, 247, 0.1);
     border-color: #7aa2f7;
     color: #7aa2f7;
+  }
+
+  .new-folder-btn {
+    background: none;
+    border: 1px solid #2f3146;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 2px 6px;
+    font-size: 11px;
+    line-height: 1;
+    color: #a9b1d6;
+  }
+
+  .new-folder-btn:hover {
+    background: rgba(158, 206, 106, 0.1);
+    border-color: #9ece6a;
+    color: #9ece6a;
+  }
+
+  .create-target-hint {
+    font-size: 11px;
+    color: #9ece6a;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .folder-hint-icon {
+    font-size: 14px;
+    flex-shrink: 0;
   }
 
   .new-file-input {

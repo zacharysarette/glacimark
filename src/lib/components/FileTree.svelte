@@ -7,30 +7,38 @@
   let {
     entries,
     selectedPath = "",
+    selectedFolderPath = "",
     onselect,
     onfocuschange,
+    onfolderselect,
+    onmovefile,
     renamingPath = "",
     renameError = "",
     onstartrename,
     onconfirmrename,
     oncancelrename,
     ondelete,
+    onsaveas,
   }: {
     entries: FileEntry[];
     selectedPath?: string;
+    selectedFolderPath?: string;
     onselect: (path: string, event?: MouseEvent) => void;
     onfocuschange?: (path: string) => void;
+    onfolderselect?: (path: string) => void;
+    onmovefile?: (sourcePath: string, targetDir: string) => void;
     renamingPath?: string;
     renameError?: string;
     onstartrename?: (path: string) => void;
     onconfirmrename?: (oldPath: string, newName: string) => void;
     oncancelrename?: () => void;
     ondelete?: (path: string) => void;
+    onsaveas?: (path: string) => void;
   } = $props();
 
   let focusedPath = $state("");
   let expandedPaths: Set<string> = $state(new Set(getExpandedPaths()));
-  let contextMenu: { x: number; y: number; path: string } | null = $state(null);
+  let contextMenu: { x: number; y: number; path: string; isDirectory: boolean } | null = $state(null);
 
   // Click-outside dismissal for context menu
   $effect(() => {
@@ -80,10 +88,7 @@
 
     if (event.key === "Delete" && focusedPath) {
       event.preventDefault();
-      const entry = findEntryByPath(entries, focusedPath);
-      if (entry && !entry.is_directory) {
-        ondelete?.(focusedPath);
-      }
+      ondelete?.(focusedPath);
     } else if (event.key === "F2" && focusedPath) {
       event.preventDefault();
       const entry = findEntryByPath(entries, focusedPath);
@@ -139,8 +144,8 @@
     }
   }
 
-  function handleContextMenu(path: string, x: number, y: number) {
-    contextMenu = { x, y, path };
+  function handleContextMenu(path: string, x: number, y: number, isDirectory: boolean) {
+    contextMenu = { x, y, path, isDirectory };
   }
 
   function handleContextMenuRename() {
@@ -153,6 +158,13 @@
   function handleContextMenuDelete() {
     if (contextMenu) {
       ondelete?.(contextMenu.path);
+      contextMenu = null;
+    }
+  }
+
+  function handleContextMenuSaveAs() {
+    if (contextMenu) {
+      onsaveas?.(contextMenu.path);
       contextMenu = null;
     }
   }
@@ -173,8 +185,11 @@
       depth={0}
       {selectedPath}
       {focusedPath}
+      {selectedFolderPath}
       {onselect}
       ontoggle={handleToggle}
+      {onfolderselect}
+      {onmovefile}
       {expandedPaths}
       {renamingPath}
       {renameError}
@@ -197,7 +212,10 @@
     style="left: {contextMenu.x}px; top: {contextMenu.y}px"
     onclick={(e) => e.stopPropagation()}
   >
-    <button class="context-menu-item" onclick={handleContextMenuRename}>Rename</button>
+    {#if !contextMenu.isDirectory}
+      <button class="context-menu-item" onclick={handleContextMenuSaveAs}>Save As</button>
+      <button class="context-menu-item" onclick={handleContextMenuRename}>Rename</button>
+    {/if}
     <button class="context-menu-item delete" onclick={handleContextMenuDelete}>Delete</button>
   </div>
 {/if}
