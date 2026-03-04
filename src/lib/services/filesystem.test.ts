@@ -14,7 +14,7 @@ vi.mock("@tauri-apps/plugin-dialog", () => ({
 
 import { invoke } from "@tauri-apps/api/core";
 import { ask, open, save } from "@tauri-apps/plugin-dialog";
-import { readDirectoryTree, readFileContents, startWatching, getDocsPath, pickFolder, searchFiles, writeFileContents, createFile, renameFile, getInitialFile, deleteFile, deleteDirectory, confirmDelete, confirmDeleteFolder, saveFileAs, moveDirectory, updateJumpList, getInitialFolder } from "./filesystem";
+import { readDirectoryTree, readFileContents, startWatching, getDocsPath, pickFolder, searchFiles, writeFileContents, createFile, renameFile, getInitialFile, deleteFile, deleteDirectory, confirmDelete, confirmDeleteFolder, saveFileAs, moveDirectory, updateJumpList, getInitialFolder, createNewWindow } from "./filesystem";
 
 const mockOpen = vi.mocked(open);
 const mockAsk = vi.mocked(ask);
@@ -294,6 +294,16 @@ describe("deleteDirectory", () => {
     mockInvoke.mockRejectedValue(new Error("Directory does not exist"));
 
     await expect(deleteDirectory("/docs/missing")).rejects.toThrow("Directory does not exist");
+  });
+});
+
+describe("createNewWindow", () => {
+  it("calls invoke with correct command", async () => {
+    mockInvoke.mockResolvedValue(undefined);
+
+    await createNewWindow();
+
+    expect(mockInvoke).toHaveBeenCalledWith("create_new_window");
   });
 });
 

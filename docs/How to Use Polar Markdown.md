@@ -150,6 +150,20 @@ When you right-click the Polar Markdown icon in the Windows taskbar, a **Recent 
 
 ---
 
+## Multiple Windows
+
+You can open multiple independent windows, each with its own sidebar, folder, and panes:
+
+- **File > New Window** or **Ctrl+Shift+N** — opens a new window
+- **Taskbar:** right-click the Polar Markdown icon and click "Polar Markdown" to open a new window
+- Each window operates independently — browse different folders, open different files, use different pane layouts
+- File changes are synced across all windows (editing a file in one window updates it in all others)
+- The app quits when the last window is closed
+
+**Note:** All windows share the same localStorage, so theme and folder preferences are shared. The last window to save a setting wins.
+
+---
+
 ## Reading Layout
 
 The markdown viewer has two reading layout modes, toggled with buttons in the top-right corner of the content area:
@@ -281,6 +295,7 @@ Polar Markdown watches your folder for changes in real time. If you edit a markd
 | **Ctrl+E** | Toggle edit/view mode on active pane |
 | **Ctrl+S** | Save immediately (in edit mode) |
 | **Ctrl+Shift+S** | Save As — save a copy with a new name/location |
+| **Ctrl+Shift+N** | Open a new window |
 | **Ctrl+Click** | Open file in a new pane |
 | **Ctrl+W** | Close active pane |
 | **Ctrl+1/2/3/4** | Switch to pane 1, 2, 3, or 4 |
