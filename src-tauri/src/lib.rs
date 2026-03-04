@@ -62,6 +62,20 @@ fn create_polar_window(app: &tauri::AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+/// Finds the focused window's label, falling back to "main" or any window.
+fn find_focused_window_label(app: &tauri::AppHandle) -> Option<String> {
+    let windows = tauri::Manager::webview_windows(app);
+    for (label, window) in &windows {
+        if window.is_focused().unwrap_or(false) {
+            return Some(label.clone());
+        }
+    }
+    if windows.contains_key("main") {
+        return Some("main".to_string());
+    }
+    windows.keys().next().cloned()
+}
+
 /// Tauri command: creates a new window.
 #[tauri::command]
 fn create_new_window(app: tauri::AppHandle) -> Result<(), String> {
@@ -134,16 +148,22 @@ pub fn run() {
                 return;
             }
             if let Some(folder_path) = extract_folder_arg(&args) {
-                let _ = tauri::Emitter::emit(app, "open-folder", folder_path);
-                if let Some(window) = tauri::Manager::get_webview_window(app, "main") {
-                    let _ = window.unminimize();
-                    let _ = window.set_focus();
+                if let Some(label) = find_focused_window_label(app) {
+                    let target = tauri::EventTarget::webview_window(&label);
+                    let _ = tauri::Emitter::emit_to(app, target, "open-folder", folder_path);
+                    if let Some(window) = tauri::Manager::get_webview_window(app, &label) {
+                        let _ = window.unminimize();
+                        let _ = window.set_focus();
+                    }
                 }
             } else if let Some(file_path) = extract_file_arg(&args) {
-                let _ = tauri::Emitter::emit(app, "open-file", file_path);
-                if let Some(window) = tauri::Manager::get_webview_window(app, "main") {
-                    let _ = window.unminimize();
-                    let _ = window.set_focus();
+                if let Some(label) = find_focused_window_label(app) {
+                    let target = tauri::EventTarget::webview_window(&label);
+                    let _ = tauri::Emitter::emit_to(app, target, "open-file", file_path);
+                    if let Some(window) = tauri::Manager::get_webview_window(app, &label) {
+                        let _ = window.unminimize();
+                        let _ = window.set_focus();
+                    }
                 }
             } else {
                 // No file/folder arg (taskbar click, Start menu, etc.): new window
@@ -196,14 +216,15 @@ pub fn run() {
                 .build()?;
             app.set_menu(menu)?;
 
-            // Handle menu events: new-window in Rust, everything else forwarded to frontend
+            // Handle menu events: new-window in Rust, everything else forwarded to focused window
             let handle = app.handle().clone();
             app.on_menu_event(move |_app, event| {
                 let id = event.id().0.as_str();
                 if id == "new-window" {
                     let _ = create_polar_window(&handle);
-                } else {
-                    let _ = tauri::Emitter::emit(&handle, &format!("menu-{}", id), ());
+                } else if let Some(label) = find_focused_window_label(&handle) {
+                    let target = tauri::EventTarget::webview_window(label);
+                    let _ = tauri::Emitter::emit_to(&handle, target, &format!("menu-{}", id), ());
                 }
             });
 

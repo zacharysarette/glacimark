@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from "svelte";
   import { listen } from "@tauri-apps/api/event";
+  import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
   import Sidebar from "./lib/components/Sidebar.svelte";
   import ContentArea from "./lib/components/ContentArea.svelte";
   import {
@@ -789,6 +790,8 @@
     document.addEventListener("dragend", globalDragEnd);
 
     (async () => {
+      const appWindow = getCurrentWebviewWindow();
+
       // Check if a folder was passed via --open-folder (jump list click)
       const initialFolder = await getInitialFolder();
       // Check if a file was passed via CLI args or OS file association
@@ -852,13 +855,13 @@
       }
 
       // Listen for folder opens from jump list clicks (single-instance plugin)
-      unlistenOpenFolder = await listen<string>("open-folder", (event) => {
+      unlistenOpenFolder = await appWindow.listen<string>("open-folder", (event) => {
         saveDocsFolder(event.payload);
         switchToFolder(event.payload);
       });
 
       // Listen for file opens from second instances (single-instance plugin)
-      unlistenOpenFile = await listen<string>("open-file", (event) => {
+      unlistenOpenFile = await appWindow.listen<string>("open-file", (event) => {
         openFileFromOS(event.payload);
       });
 
@@ -902,13 +905,13 @@
         }, 300);
       });
 
-      // Listen for native menu events
-      unlistenMenuNewFile = await listen("menu-new-file", () => handleNewFile());
-      unlistenMenuOpenFolder = await listen("menu-open-folder", () => handleChangeFolder());
-      unlistenMenuSaveAs = await listen("menu-save-as", () => handleSaveAs());
-      unlistenMenuClosePane = await listen("menu-close-pane", () => { if (activePaneId) handleClosePane(activePaneId); });
-      unlistenMenuToggleEdit = await listen("menu-toggle-edit", () => { if (activePaneId) handleToggleEdit(activePaneId); });
-      unlistenMenuHelp = await listen("menu-help", () => handleHelp());
+      // Listen for native menu events (window-scoped — only this window responds)
+      unlistenMenuNewFile = await appWindow.listen("menu-new-file", () => handleNewFile());
+      unlistenMenuOpenFolder = await appWindow.listen("menu-open-folder", () => handleChangeFolder());
+      unlistenMenuSaveAs = await appWindow.listen("menu-save-as", () => handleSaveAs());
+      unlistenMenuClosePane = await appWindow.listen("menu-close-pane", () => { if (activePaneId) handleClosePane(activePaneId); });
+      unlistenMenuToggleEdit = await appWindow.listen("menu-toggle-edit", () => { if (activePaneId) handleToggleEdit(activePaneId); });
+      unlistenMenuHelp = await appWindow.listen("menu-help", () => handleHelp());
 
       // Ensure theme file exists for next launch (handles upgrade from older versions)
       saveThemeFile(theme).catch(() => {});
