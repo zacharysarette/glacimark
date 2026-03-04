@@ -235,24 +235,39 @@ echo [7/7] Creating GitHub Release !TAG!...
 gh release view !TAG! >nul 2>&1
 if not errorlevel 1 (
     echo Release !TAG! already exists -- uploading Windows artifacts...
+    if exist RELEASE_NOTES.md (
+        gh release edit !TAG! --notes-file RELEASE_NOTES.md
+    )
     gh release upload !TAG! "!NSIS!#Polar Markdown Installer (NSIS)" "!MSI!#Polar Markdown Installer (MSI)" --clobber
     if errorlevel 1 (
         echo Upload failed.
+        del RELEASE_NOTES.md 2>nul
         exit /b 1
     )
+    del RELEASE_NOTES.md 2>nul
     goto :done
 )
 
-gh release create !TAG! ^
-    "!NSIS!#Polar Markdown Installer (NSIS)" ^
-    "!MSI!#Polar Markdown Installer (MSI)" ^
-    --title "Polar Markdown !TAG!" ^
-    --notes "Polar Markdown !TAG! -- Windows x64 installers. Run the NSIS .exe (recommended) or MSI to install."
+if exist RELEASE_NOTES.md (
+    gh release create !TAG! ^
+        "!NSIS!#Polar Markdown Installer (NSIS)" ^
+        "!MSI!#Polar Markdown Installer (MSI)" ^
+        --title "Polar Markdown !TAG!" ^
+        --notes-file RELEASE_NOTES.md
+) else (
+    gh release create !TAG! ^
+        "!NSIS!#Polar Markdown Installer (NSIS)" ^
+        "!MSI!#Polar Markdown Installer (MSI)" ^
+        --title "Polar Markdown !TAG!" ^
+        --notes "Polar Markdown !TAG! -- Windows x64 installers. Run the NSIS .exe (recommended) or MSI to install."
+)
 
 if errorlevel 1 (
     echo Release creation failed.
+    del RELEASE_NOTES.md 2>nul
     exit /b 1
 )
+del RELEASE_NOTES.md 2>nul
 
 :done
 echo.

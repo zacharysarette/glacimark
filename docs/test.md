@@ -290,4 +290,15 @@ Right-click the Polar Markdown icon in the Windows taskbar to see **Recent Folde
 
 ---
 
+## Multi-Window
+
+Polar Markdown supports multiple independent windows. To test:
+
+1. **Ctrl+Shift+N** or **File > New Window** — a second window should open with the correct theme
+2. Each window should independently browse folders, open files, and manage panes
+3. Editing a file in one window should update it in all other open windows (file watcher sync)
+4. Closing one window should leave others running; closing the last window exits the app
+
+---
+
 *This file is a rendering museum — every feature of Polar Markdown displayed in one place.*

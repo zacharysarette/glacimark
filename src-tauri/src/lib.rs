@@ -3,6 +3,7 @@ mod models;
 
 use commands::watcher::WatcherState;
 use std::path::Path;
+use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Mutex;
 
 /// Holds the file path passed via CLI args (if any). `.take()` ensures it's consumed once.
@@ -11,11 +12,60 @@ pub struct InitialFileState(pub Mutex<Option<String>>);
 /// Holds a folder path passed via `--open-folder` CLI arg (from jump list). Consumed once.
 pub struct InitialFolderState(pub Mutex<Option<String>>);
 
+/// Atomic counter for generating unique window labels ("polar-2", "polar-3", ...).
+pub struct WindowCounter(pub AtomicU32);
+
+/// Generates a unique window label like "polar-2", "polar-3", etc.
+fn generate_window_label(counter: &WindowCounter) -> String {
+    let id = counter.0.fetch_add(1, Ordering::SeqCst);
+    format!("polar-{}", id)
+}
+
 /// Reads the saved theme from the app data directory (written by the frontend).
 fn read_saved_theme(app: &tauri::App) -> Option<String> {
     let dir = tauri::Manager::path(app).app_data_dir().ok()?;
     let path = dir.join("theme.txt");
     std::fs::read_to_string(path).ok().map(|s| s.trim().to_string())
+}
+
+/// Reads the saved theme using an AppHandle (for use outside setup).
+fn read_saved_theme_from_handle(app: &tauri::AppHandle) -> Option<String> {
+    let dir = tauri::Manager::path(app).app_data_dir().ok()?;
+    let path = dir.join("theme.txt");
+    std::fs::read_to_string(path).ok().map(|s| s.trim().to_string())
+}
+
+/// Creates a new Polar Markdown window with the correct theme background.
+fn create_polar_window(app: &tauri::AppHandle) -> Result<(), String> {
+    let counter = tauri::Manager::state::<WindowCounter>(app);
+    let label = generate_window_label(&counter);
+
+    let color = match read_saved_theme_from_handle(app) {
+        Some(t) if t == "glacier" => tauri::webview::Color(0xf4, 0xf7, 0xfb, 0xff),
+        _ => tauri::webview::Color(0x1a, 0x1b, 0x26, 0xff),
+    };
+
+    let window = tauri::webview::WebviewWindowBuilder::new(
+        app,
+        &label,
+        tauri::WebviewUrl::App("index.html".into()),
+    )
+    .title("Polar Markdown")
+    .inner_size(1200.0, 800.0)
+    .min_inner_size(800.0, 600.0)
+    .visible(false)
+    .build()
+    .map_err(|e| e.to_string())?;
+
+    let _ = window.set_background_color(Some(color));
+    let _ = window.show();
+    Ok(())
+}
+
+/// Tauri command: creates a new window.
+#[tauri::command]
+fn create_new_window(app: tauri::AppHandle) -> Result<(), String> {
+    create_polar_window(&app)
 }
 
 /// Extracts a .md file path from CLI arguments.
@@ -69,19 +119,26 @@ pub fn run() {
         .manage(WatcherState(Mutex::new(None)))
         .manage(InitialFileState(Mutex::new(None)))
         .manage(InitialFolderState(Mutex::new(None)))
+        .manage(WindowCounter(AtomicU32::new(2)))
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
-            // Second instance launched — check for folder or file arg
+            // Second instance launched — check for folder, file, or open new window
             if let Some(folder_path) = extract_folder_arg(&args) {
                 let _ = tauri::Emitter::emit(app, "open-folder", folder_path);
+                if let Some(window) = tauri::Manager::get_webview_window(app, "main") {
+                    let _ = window.unminimize();
+                    let _ = window.set_focus();
+                }
             } else if let Some(file_path) = extract_file_arg(&args) {
                 let _ = tauri::Emitter::emit(app, "open-file", file_path);
-            }
-            // Focus the existing main window
-            if let Some(window) = tauri::Manager::get_webview_window(app, "main") {
-                let _ = window.unminimize();
-                let _ = window.set_focus();
+                if let Some(window) = tauri::Manager::get_webview_window(app, "main") {
+                    let _ = window.unminimize();
+                    let _ = window.set_focus();
+                }
+            } else {
+                // No file/folder arg (taskbar click, Start menu, etc.): new window
+                let _ = create_polar_window(app);
             }
         }))
         .setup(|app| {
@@ -106,6 +163,30 @@ pub fn run() {
                     *guard = Some(file_path);
                 };
             }
+
+            // Application menu: File > New Window (Ctrl+Shift+N)
+            let new_window_item = tauri::menu::MenuItem::with_id(
+                app,
+                "new-window",
+                "New Window",
+                true,
+                Some("CmdOrCtrl+Shift+N"),
+            )?;
+            let file_menu = tauri::menu::SubmenuBuilder::new(app, "File")
+                .item(&new_window_item)
+                .build()?;
+            let menu = tauri::menu::MenuBuilder::new(app)
+                .item(&file_menu)
+                .build()?;
+            app.set_menu(menu)?;
+
+            // Handle menu events
+            let handle = app.handle().clone();
+            app.on_menu_event(move |_app, event| {
+                if event.id().0 == "new-window" {
+                    let _ = create_polar_window(&handle);
+                }
+            });
 
             // Set native window background color to match saved theme, then show.
             // Window starts hidden (tauri.conf.json visible:false) so the user
@@ -143,6 +224,7 @@ pub fn run() {
             commands::diagram::render_ascii_diagram,
             commands::jumplist::update_jump_list,
             commands::jumplist::clear_jump_list,
+            create_new_window,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -152,6 +234,39 @@ pub fn run() {
 mod tests {
     use super::*;
     use std::fs;
+    use std::sync::atomic::AtomicU32;
+
+    #[test]
+    fn test_generate_window_label_starts_at_2() {
+        let counter = WindowCounter(AtomicU32::new(2));
+        let label = generate_window_label(&counter);
+        assert_eq!(label, "polar-2");
+    }
+
+    #[test]
+    fn test_generate_window_label_increments() {
+        let counter = WindowCounter(AtomicU32::new(2));
+        assert_eq!(generate_window_label(&counter), "polar-2");
+        assert_eq!(generate_window_label(&counter), "polar-3");
+        assert_eq!(generate_window_label(&counter), "polar-4");
+    }
+
+    #[test]
+    fn test_window_counter_is_thread_safe() {
+        use std::collections::HashSet;
+        use std::sync::Arc;
+
+        let counter = Arc::new(WindowCounter(AtomicU32::new(2)));
+        let mut handles = vec![];
+
+        for _ in 0..5 {
+            let c = Arc::clone(&counter);
+            handles.push(std::thread::spawn(move || generate_window_label(&c)));
+        }
+
+        let labels: HashSet<String> = handles.into_iter().map(|h| h.join().unwrap()).collect();
+        assert_eq!(labels.len(), 5, "All labels should be unique");
+    }
 
     #[test]
     fn test_extract_file_arg_finds_md_file() {

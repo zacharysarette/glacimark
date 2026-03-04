@@ -108,6 +108,10 @@ export async function getInitialFolder(): Promise<string | null> {
   return invoke<string | null>("get_initial_folder");
 }
 
+export async function createNewWindow(): Promise<void> {
+  await invoke("create_new_window");
+}
+
 export async function pickFolder(): Promise<string | null> {
   const selected = await open({
     directory: true,
