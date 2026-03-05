@@ -170,8 +170,70 @@ export async function renderMarkdown(content: string, filePath?: string): Promis
   return marked.parse(content) as Promise<string>;
 }
 
-export async function renderMermaidDiagrams(): Promise<void> {
-  await mermaid.run({ querySelector: "pre.mermaid" });
+export interface MermaidDiagnostic {
+  blockIndex: number;
+  error: string;
+}
+
+export interface MermaidRenderResult {
+  total: number;
+  errorCount: number;
+  diagnostics: MermaidDiagnostic[];
+}
+
+/** Validate all pre.mermaid blocks without rendering. Returns diagnostics for failed blocks. */
+export async function validateMermaidBlocks(): Promise<MermaidDiagnostic[]> {
+  const blocks = document.querySelectorAll("pre.mermaid");
+  const diagnostics: MermaidDiagnostic[] = [];
+
+  for (let i = 0; i < blocks.length; i++) {
+    const text = blocks[i].textContent ?? "";
+    try {
+      await mermaid.parse(text);
+    } catch (err: any) {
+      diagnostics.push({
+        blockIndex: i,
+        error: err?.message ?? String(err),
+      });
+    }
+  }
+
+  return diagnostics;
+}
+
+let mermaidRenderCounter = 0;
+
+export async function renderMermaidDiagrams(): Promise<MermaidRenderResult> {
+  const blocks = document.querySelectorAll("pre.mermaid");
+  const total = blocks.length;
+  const diagnostics: MermaidDiagnostic[] = [];
+
+  if (total === 0) return { total: 0, errorCount: 0, diagnostics: [] };
+
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i] as HTMLElement;
+    const text = block.textContent ?? "";
+
+    try {
+      await mermaid.parse(text);
+      // Valid — render it
+      const id = `mermaid-render-${mermaidRenderCounter++}`;
+      const { svg } = await mermaid.render(id, text);
+      block.innerHTML = svg;
+    } catch (err: any) {
+      const errorMsg = err?.message ?? String(err);
+      diagnostics.push({ blockIndex: i, error: errorMsg });
+
+      // Inject error overlay — keep raw source visible
+      const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      block.innerHTML =
+        `<div class="mermaid-error">Diagram error: ${errorMsg.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>` +
+        `<code>${escaped}</code>`;
+      block.classList.add("mermaid-invalid");
+    }
+  }
+
+  return { total, errorCount: diagnostics.length, diagnostics };
 }
 
 export async function renderBobDiagrams(): Promise<void> {

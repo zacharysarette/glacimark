@@ -429,6 +429,49 @@ mark.search-highlight {
   transition: background 0.15s ease, outline-color 0.15s ease;
 }
 
+/* Mermaid error overlay — shown on invalid diagram blocks */
+pre.mermaid.mermaid-invalid {
+  border: 2px solid var(--red);
+  border-radius: 6px;
+  background: var(--red-bg);
+  padding: 0;
+}
+
+pre.mermaid.mermaid-invalid code {
+  display: block;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.mermaid-error {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--red);
+  background: var(--red-bg);
+  border-bottom: 1px solid var(--red);
+  border-radius: 4px 4px 0 0;
+}
+
+.mermaid-error::before {
+  content: "\26A0\FE0F ";
+}
+
+/* Glacier theme overrides for mermaid errors */
+[data-theme="glacier"] pre.mermaid.mermaid-invalid {
+  border-color: #d32f2f;
+  background: rgba(211, 47, 47, 0.08);
+}
+
+[data-theme="glacier"] .mermaid-error {
+  color: #d32f2f;
+  background: rgba(211, 47, 47, 0.08);
+  border-bottom-color: #d32f2f;
+}
+
 /* Active line highlight — single line within a code block */
 .active-line-overlay {
   background: var(--accent-bg);

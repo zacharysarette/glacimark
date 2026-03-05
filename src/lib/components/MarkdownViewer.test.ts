@@ -6,6 +6,8 @@ vi.mock("mermaid", () => ({
   default: {
     initialize: vi.fn(),
     run: vi.fn().mockResolvedValue(undefined),
+    parse: vi.fn().mockResolvedValue(true),
+    render: vi.fn().mockResolvedValue({ svg: '<svg></svg>', bindFunctions: vi.fn() }),
   },
 }));
 
@@ -365,6 +367,40 @@ describe("MarkdownViewer", () => {
       link.click();
 
       expect(onfilelink).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("mermaid status indicator", () => {
+    it("shows mermaid status when diagrams are present", async () => {
+      const contentWithMermaid = "# Title\n\n```mermaid\nflowchart TD\n    A-->B\n```";
+      const { container } = render(MarkdownViewer, {
+        props: { content: contentWithMermaid, filePath: "/docs/test.md" },
+      });
+
+      // Wait for markdown rendering + diagram debounce (1000ms) + signalContentReady (200ms)
+      await vi.waitFor(() => {
+        const status = container.querySelector(".mermaid-status");
+        expect(status).not.toBeNull();
+      }, { timeout: 3000 });
+    });
+
+    it("shows error status when diagrams fail", async () => {
+      // Import and mock mermaid.parse to fail
+      const mermaid = (await import("mermaid")).default;
+      vi.mocked(mermaid.parse).mockRejectedValue(new Error("Parse error"));
+
+      const contentWithBadMermaid = "# Title\n\n```mermaid\nbad diagram\n```";
+      const { container } = render(MarkdownViewer, {
+        props: { content: contentWithBadMermaid, filePath: "/docs/test.md" },
+      });
+
+      await vi.waitFor(() => {
+        const status = container.querySelector(".mermaid-status.has-errors");
+        expect(status).not.toBeNull();
+      }, { timeout: 3000 });
+
+      // Reset mock for other tests
+      vi.mocked(mermaid.parse).mockResolvedValue(true as any);
     });
   });
 
