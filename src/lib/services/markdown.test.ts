@@ -480,6 +480,73 @@ describe("renderMermaidDiagrams per-block error handling", () => {
   });
 });
 
+describe("renderMarkdown source line numbers", () => {
+  it("adds data-source-line to headings when enabled", async () => {
+    const html = await renderMarkdown("# Hello\n\nWorld", undefined, { sourceLineNumbers: true });
+    expect(html).toContain('data-source-line="1"');
+  });
+
+  it("adds data-source-line to paragraphs when enabled", async () => {
+    const html = await renderMarkdown("# Title\n\nSome paragraph", undefined, { sourceLineNumbers: true });
+    expect(html).toMatch(/data-source-line="3"/);
+  });
+
+  it("does NOT add data-source-line when disabled", async () => {
+    const html = await renderMarkdown("# Hello\n\nWorld");
+    expect(html).not.toContain("data-source-line");
+  });
+
+  it("does NOT add data-source-line when option is false", async () => {
+    const html = await renderMarkdown("# Hello\n\nWorld", undefined, { sourceLineNumbers: false });
+    expect(html).not.toContain("data-source-line");
+  });
+
+  it("adds data-source-line to code blocks", async () => {
+    const md = "# Title\n\n```js\nconst x = 1;\n```";
+    const html = await renderMarkdown(md, undefined, { sourceLineNumbers: true });
+    expect(html).toMatch(/<pre[^>]*data-source-line="3"/);
+  });
+
+  it("adds data-source-line to blockquotes", async () => {
+    const md = "Hello\n\n> Quote here";
+    const html = await renderMarkdown(md, undefined, { sourceLineNumbers: true });
+    expect(html).toMatch(/<blockquote[^>]*data-source-line="3"/);
+  });
+
+  it("adds data-source-line to lists", async () => {
+    const md = "Hello\n\n- Item 1\n- Item 2";
+    const html = await renderMarkdown(md, undefined, { sourceLineNumbers: true });
+    expect(html).toMatch(/<ul[^>]*data-source-line="3"/);
+  });
+
+  it("adds data-source-line to tables", async () => {
+    const md = "Hello\n\n| A | B |\n|---|---|\n| 1 | 2 |";
+    const html = await renderMarkdown(md, undefined, { sourceLineNumbers: true });
+    expect(html).toMatch(/<table[^>]*data-source-line="3"/);
+  });
+
+  it("adds data-source-line to hr", async () => {
+    const md = "Hello\n\n---\n\nWorld";
+    const html = await renderMarkdown(md, undefined, { sourceLineNumbers: true });
+    expect(html).toMatch(/<hr[^>]*data-source-line="3"/);
+  });
+
+  it("tracks correct line numbers in multi-block documents", async () => {
+    const md = "# Title\n\nParagraph one.\n\n## Second\n\nParagraph two.";
+    const html = await renderMarkdown(md, undefined, { sourceLineNumbers: true });
+    expect(html).toContain('data-source-line="1"');  // # Title
+    expect(html).toContain('data-source-line="3"');  // Paragraph one
+    expect(html).toContain('data-source-line="5"');  // ## Second
+    expect(html).toContain('data-source-line="7"');  // Paragraph two
+  });
+
+  it("adds data-source-line to mermaid blocks", async () => {
+    const md = "# Title\n\n```mermaid\nflowchart TD\n    A-->B\n```";
+    const html = await renderMarkdown(md, undefined, { sourceLineNumbers: true });
+    expect(html).toMatch(/<pre[^>]*class="mermaid"[^>]*data-source-line="3"/);
+  });
+});
+
 describe("renderMarkdown image integration", () => {
   it("renders external image URL unchanged", async () => {
     const html = await renderMarkdown("![alt](https://example.com/img.png)");

@@ -17,6 +17,8 @@ import {
   saveRecentFolders,
   getRecentFolders,
   addRecentFolder,
+  saveLineNumbers,
+  getLineNumbers,
 } from "./persistence";
 
 const STORAGE_KEY = "polar-markdown:last-selected-path";
@@ -192,5 +194,27 @@ describe("addRecentFolder", () => {
     const result = addRecentFolder("C:\\new");
     expect(result.length).toBe(10);
     expect(result[0]).toBe("C:\\new");
+  });
+});
+
+describe("saveLineNumbers / getLineNumbers", () => {
+  it("returns false as the default when nothing stored", () => {
+    expect(getLineNumbers()).toBe(false);
+  });
+
+  it("round-trips true", () => {
+    saveLineNumbers(true);
+    expect(getLineNumbers()).toBe(true);
+  });
+
+  it("round-trips false", () => {
+    saveLineNumbers(true);
+    saveLineNumbers(false);
+    expect(getLineNumbers()).toBe(false);
+  });
+
+  it("returns false for corrupted data", () => {
+    localStorage.setItem("polar-markdown:line-numbers", "not-json");
+    expect(getLineNumbers()).toBe(false);
   });
 });
