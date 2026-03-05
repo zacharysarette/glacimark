@@ -11,6 +11,8 @@
     filePath = "",
     layoutMode = "centered" as LayoutMode,
     onlayoutchange,
+    showLineNumbers = false,
+    onlinenumberschange,
     highlightText = "",
     highlightKey = 0,
     activeLineText = "",
@@ -25,6 +27,8 @@
     filePath?: string;
     layoutMode?: LayoutMode;
     onlayoutchange?: (mode: LayoutMode) => void;
+    showLineNumbers?: boolean;
+    onlinenumberschange?: (enabled: boolean) => void;
     highlightText?: string;
     highlightKey?: number;
     activeLineText?: string;
@@ -53,8 +57,9 @@
   }
 
   $effect(() => {
+    const _lineNumbers = showLineNumbers; // depend on toggle
     if (content) {
-      renderMarkdown(content, filePath).then(async (html) => {
+      renderMarkdown(content, filePath, { sourceLineNumbers: showLineNumbers }).then(async (html) => {
         htmlContent = html;
         cachedBlocks = undefined; // Invalidate block cache on content change
         clearLineHeightCache();
@@ -463,12 +468,13 @@
           </span>
         {/if}
         <div class="layout-controls">
+          <button class="line-numbers-toggle" class:active={showLineNumbers} onclick={() => onlinenumberschange?.(!showLineNumbers)} title="Toggle source line numbers">1:</button>
           <button class:active={layoutMode === "centered"} onclick={() => onlayoutchange?.("centered")} title="Single column">&#x2261;</button>
           <button class:active={layoutMode === "columns"} onclick={() => onlayoutchange?.("columns")} title="Multi-column">&#x229E;</button>
         </div>
       </header>
     {/if}
-    <article class="markdown-body" class:centered={layoutMode === "centered"} class:columns={layoutMode === "columns"} bind:this={articleEl} onclick={handleAnchorClick}>
+    <article class="markdown-body" class:centered={layoutMode === "centered"} class:columns={layoutMode === "columns"} class:show-source-lines={showLineNumbers} bind:this={articleEl} onclick={handleAnchorClick}>
       {@html htmlContent}
     </article>
   {:else}
@@ -545,6 +551,12 @@
     background: var(--bg-secondary);
     border-color: var(--accent);
     color: var(--accent);
+  }
+
+  .line-numbers-toggle {
+    font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 600;
   }
 
   .markdown-body {

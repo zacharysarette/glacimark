@@ -377,6 +377,33 @@ pre.line-numbers {
   text-align: right;
 }
 
+/* Source line number gutter */
+.markdown-body.show-source-lines {
+  padding-left: 64px;
+}
+.markdown-body.show-source-lines.columns {
+  padding-left: 32px; /* Reduced in columns layout */
+}
+.markdown-body.show-source-lines [data-source-line] {
+  position: relative;
+}
+.markdown-body.show-source-lines [data-source-line]::before {
+  content: attr(data-source-line);
+  position: absolute;
+  left: -48px;
+  width: 36px;
+  text-align: right;
+  font-size: 12px;
+  font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", monospace;
+  color: var(--text-muted);
+  opacity: 0.6;
+  user-select: none;
+  pointer-events: none;
+}
+.markdown-body.show-source-lines.centered {
+  max-width: 864px; /* 800px + 64px gutter */
+}
+
 /* Search result highlight — inline text match */
 mark.search-highlight {
   background: var(--yellow-highlight);

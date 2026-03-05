@@ -175,6 +175,18 @@ The markdown viewer has two reading layout modes, toggled with buttons in the to
 
 Your chosen layout is remembered across sessions.
 
+### Source Line Numbers
+
+Click the **1:** button in the top-right corner to toggle source line numbers. When enabled, each block-level element (headings, paragraphs, code blocks, lists, tables, blockquotes, horizontal rules) shows its original source line number in the left gutter.
+
+This is useful for:
+
+- Correlating rendered content with search result line numbers
+- Discussing specific parts of a document by line reference
+- Debugging markdown formatting issues
+
+The toggle state is remembered across sessions.
+
 ---
 
 ## Viewing Markdown

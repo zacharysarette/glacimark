@@ -10,6 +10,7 @@ const OPEN_PANES_KEY = "polar-markdown:open-panes";
 const EXPANDED_PATHS_KEY = "polar-markdown:expanded-paths";
 const RECENT_FOLDERS_KEY = "polar-markdown:recent-folders";
 const THEME_KEY = "polar-markdown:theme";
+const LINE_NUMBERS_KEY = "polar-markdown:line-numbers";
 
 export function saveLastSelectedPath(path: string): void {
   localStorage.setItem(STORAGE_KEY, path);
@@ -100,4 +101,18 @@ export function saveTheme(theme: ThemeType): void {
 
 export function getTheme(): ThemeType {
   return (localStorage.getItem(THEME_KEY) as ThemeType) || "aurora";
+}
+
+export function saveLineNumbers(enabled: boolean): void {
+  localStorage.setItem(LINE_NUMBERS_KEY, JSON.stringify(enabled));
+}
+
+export function getLineNumbers(): boolean {
+  const stored = localStorage.getItem(LINE_NUMBERS_KEY);
+  if (!stored) return false;
+  try {
+    return JSON.parse(stored) === true;
+  } catch {
+    return false;
+  }
 }

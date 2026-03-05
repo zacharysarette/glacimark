@@ -102,15 +102,30 @@ let currentMarkdownDir = "";
 // Track whether to use dark or light theme for svgbob diagrams
 let bobDarkMode = true;
 
+// Track whether source line number attributes should be emitted
+let sourceLineNumbersEnabled = false;
+
+// Map from token index to source line number (populated during two-phase render)
+let tokenLineMap = new Map<number, number>();
+let tokenIndex = 0;
+
 /** Set svgbob dark mode. Called when app theme changes. */
 export function setBobDarkMode(dark: boolean): void {
   bobDarkMode = dark;
 }
 
-function wrapWithLineNumbers(highlighted: string, text: string, langClass: string): string {
+/** Get data-source-line attribute string if source line numbers are enabled for this token. */
+function getSourceLineAttr(token: any): string {
+  if (!sourceLineNumbersEnabled) return "";
+  const line = token?._sourceLine;
+  if (line == null) return "";
+  return ` data-source-line="${line}"`;
+}
+
+function wrapWithLineNumbers(highlighted: string, text: string, langClass: string, lineAttr = ""): string {
   const lineCount = text.endsWith('\n') ? text.split('\n').length - 1 : text.split('\n').length;
   const lineRows = '<span></span>'.repeat(lineCount);
-  return `<pre class="line-numbers"><code class="hljs ${langClass}">${highlighted}</code><span class="line-numbers-rows" aria-hidden="true">${lineRows}</span></pre>`;
+  return `<pre class="line-numbers"${lineAttr}><code class="hljs ${langClass}">${highlighted}</code><span class="line-numbers-rows" aria-hidden="true">${lineRows}</span></pre>`;
 }
 
 // Create a configured Marked instance with syntax highlighting and mermaid support
@@ -118,15 +133,16 @@ const marked = new Marked({
   hooks: {
     postprocess(html) {
       return html
-        .replace(/<table>/g, '<div class="table-wrapper"><table>')
+        .replace(/<table([^>]*)>/g, '<div class="table-wrapper"><table$1>')
         .replace(/<\/table>/g, '</table></div>');
     },
   },
   renderer: {
-    heading({ tokens, depth, text }: { tokens: any[]; depth: number; text: string }) {
+    heading(token: any) {
+      const { tokens, depth, text } = token;
       const slug = getUniqueSlug(slugify(text));
       const content = (this as any).parser.parseInline(tokens);
-      return `<h${depth} id="${slug}">${content}</h${depth}>\n`;
+      return `<h${depth} id="${slug}"${getSourceLineAttr(token)}>${content}</h${depth}>\n`;
     },
     image({ href, title, text }: { href: string; title?: string | null; text: string }) {
       const resolvedHref = resolveImageSrc(href, currentMarkdownDir);
@@ -135,38 +151,121 @@ const marked = new Marked({
       const onerror = `this.classList.add('img-broken');this.alt=this.alt||'Image not found'`;
       return `<img src="${resolvedHref}"${altAttr}${titleAttr} loading="lazy" onerror="${onerror}">`;
     },
-    code({ text, lang }: { text: string; lang?: string }) {
+    code(token: any) {
+      const { text, lang } = token;
+      const lineAttr = getSourceLineAttr(token);
       // Mermaid blocks get rendered as pre.mermaid for mermaid.run() to pick up
       if (lang === "mermaid") {
-        return `<pre class="mermaid">${text}</pre>`;
+        return `<pre class="mermaid"${lineAttr}>${text}</pre>`;
       }
 
       // Explicitly tagged bob/ascii blocks
       if (lang === "bob" || lang === "svgbob" || lang === "ascii-diagram") {
-        return toBobBlock(text);
+        const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        return `<pre class="bob"${lineAttr}>${escaped}</pre>`;
       }
 
       // All tagged code gets syntax highlighted
       if (lang && hljs.getLanguage(lang)) {
         const highlighted = hljs.highlight(text, { language: lang }).value;
-        return wrapWithLineNumbers(highlighted, text, 'language-' + lang);
+        return wrapWithLineNumbers(highlighted, text, 'language-' + lang, lineAttr);
       }
 
       // Auto-detect: unlabeled blocks with box-drawing/arrow Unicode chars are diagrams
       if (!lang && looksLikeDiagram(text)) {
-        return toBobBlock(text);
+        const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        return `<pre class="bob"${lineAttr}>${escaped}</pre>`;
       }
 
       // Fallback: auto-detect language
       const highlighted = hljs.highlightAuto(text).value;
-      return wrapWithLineNumbers(highlighted, text, '');
+      return wrapWithLineNumbers(highlighted, text, '', lineAttr);
+    },
+    paragraph(token: any) {
+      const content = (this as any).parser.parseInline(token.tokens);
+      return `<p${getSourceLineAttr(token)}>${content}</p>\n`;
+    },
+    blockquote(token: any) {
+      const body = (this as any).parser.parse(token.tokens);
+      return `<blockquote${getSourceLineAttr(token)}>\n${body}</blockquote>\n`;
+    },
+    list(token: any) {
+      const tag = token.ordered ? "ol" : "ul";
+      const startAttr = token.ordered && token.start !== 1 ? ` start="${token.start}"` : "";
+      let body = "";
+      for (const item of token.items) {
+        body += (this as any).listitem(item);
+      }
+      return `<${tag}${startAttr}${getSourceLineAttr(token)}>\n${body}</${tag}>\n`;
+    },
+    table(token: any) {
+      let header = "";
+      let cell = "";
+      for (let j = 0; j < token.header.length; j++) {
+        const content = (this as any).parser.parseInline(token.header[j].tokens);
+        const align = token.align[j];
+        const alignAttr = align ? ` align="${align}"` : "";
+        cell += `<th${alignAttr}>${content}</th>\n`;
+      }
+      header += `<tr>\n${cell}</tr>\n`;
+
+      let body = "";
+      for (let i = 0; i < token.rows.length; i++) {
+        const row = token.rows[i];
+        cell = "";
+        for (let j = 0; j < row.length; j++) {
+          const content = (this as any).parser.parseInline(row[j].tokens);
+          const align = token.align[j];
+          const alignAttr = align ? ` align="${align}"` : "";
+          cell += `<td${alignAttr}>${content}</td>\n`;
+        }
+        body += `<tr>\n${cell}</tr>\n`;
+      }
+
+      return `<table${getSourceLineAttr(token)}>\n<thead>\n${header}</thead>\n<tbody>${body}</tbody>\n</table>\n`;
+    },
+    hr(token: any) {
+      return `<hr${getSourceLineAttr(token)}>\n`;
     },
   },
 });
 
-export async function renderMarkdown(content: string, filePath?: string): Promise<string> {
+export interface RenderOptions {
+  sourceLineNumbers?: boolean;
+}
+
+/** Annotate top-level tokens with _sourceLine based on their position in the source. */
+function annotateSourceLines(tokens: any[]): void {
+  let line = 1;
+  for (const token of tokens) {
+    if (token.type === "space") {
+      // Count newlines in whitespace tokens but don't annotate them
+      if (token.raw) {
+        line += (token.raw.match(/\n/g) || []).length;
+      }
+      continue;
+    }
+    token._sourceLine = line;
+    if (token.raw) {
+      line += (token.raw.match(/\n/g) || []).length;
+    }
+  }
+}
+
+export async function renderMarkdown(content: string, filePath?: string, options?: RenderOptions): Promise<string> {
   slugCounts = new Map<string, number>();
   currentMarkdownDir = filePath ? getDirectory(filePath) : "";
+  sourceLineNumbersEnabled = options?.sourceLineNumbers === true;
+
+  if (sourceLineNumbersEnabled) {
+    const tokens = marked.lexer(content);
+    annotateSourceLines(tokens);
+    const html = marked.parser(tokens);
+    sourceLineNumbersEnabled = false;
+    return html;
+  }
+
+  sourceLineNumbersEnabled = false;
   return marked.parse(content) as Promise<string>;
 }
 

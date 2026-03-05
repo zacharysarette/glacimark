@@ -9,6 +9,8 @@
     activePaneId = "",
     layoutMode = "centered" as LayoutMode,
     onlayoutchange,
+    showLineNumbers = false,
+    onlinenumberschange,
     onclosepane,
     onactivatepane,
     ontoggleedit,
@@ -24,6 +26,8 @@
     activePaneId?: string;
     layoutMode?: LayoutMode;
     onlayoutchange?: (mode: LayoutMode) => void;
+    showLineNumbers?: boolean;
+    onlinenumberschange?: (enabled: boolean) => void;
     onclosepane?: (id: string) => void;
     onactivatepane?: (id: string) => void;
     ontoggleedit?: (id: string) => void;
@@ -134,6 +138,8 @@
             filePath={pane.path}
             {layoutMode}
             {onlayoutchange}
+            {showLineNumbers}
+            {onlinenumberschange}
             highlightText={pane.id === activePaneId ? highlightText : ""}
             highlightKey={pane.id === activePaneId ? highlightKey : 0}
             {onfilelink}

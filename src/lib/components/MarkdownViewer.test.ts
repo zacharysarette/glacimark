@@ -105,6 +105,56 @@ describe("MarkdownViewer", () => {
     });
   });
 
+  describe("source line numbers toggle", () => {
+    it("renders the line numbers toggle button", async () => {
+      render(MarkdownViewer, {
+        props: { content: "# Hello", filePath: "/docs/test.md" },
+      });
+
+      await vi.waitFor(() => {
+        expect(screen.getByTitle("Toggle source line numbers")).toBeInTheDocument();
+      });
+    });
+
+    it("fires onlinenumberschange when toggle is clicked", async () => {
+      const onlinenumberschange = vi.fn();
+      render(MarkdownViewer, {
+        props: { content: "# Hello", filePath: "/docs/test.md", showLineNumbers: false, onlinenumberschange },
+      });
+
+      await vi.waitFor(() => {
+        expect(screen.getByTitle("Toggle source line numbers")).toBeInTheDocument();
+      });
+
+      screen.getByTitle("Toggle source line numbers").click();
+      expect(onlinenumberschange).toHaveBeenCalledWith(true);
+    });
+
+    it("applies show-source-lines class when enabled", async () => {
+      render(MarkdownViewer, {
+        props: { content: "# Hello", filePath: "/docs/test.md", showLineNumbers: true },
+      });
+
+      await vi.waitFor(() => {
+        const article = document.querySelector("article.markdown-body");
+        expect(article).not.toBeNull();
+        expect(article!.classList.contains("show-source-lines")).toBe(true);
+      });
+    });
+
+    it("does NOT apply show-source-lines class when disabled", async () => {
+      render(MarkdownViewer, {
+        props: { content: "# Hello", filePath: "/docs/test.md", showLineNumbers: false },
+      });
+
+      await vi.waitFor(() => {
+        const article = document.querySelector("article.markdown-body");
+        expect(article).not.toBeNull();
+        expect(article!.classList.contains("show-source-lines")).toBe(false);
+      });
+    });
+  });
+
   describe("anchor link scrolling", () => {
     it("scrolls to target heading when anchor link is clicked", async () => {
       const { container } = render(MarkdownViewer, {

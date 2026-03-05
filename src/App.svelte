@@ -42,6 +42,8 @@
     getOpenPanes,
     saveTheme,
     getTheme,
+    saveLineNumbers,
+    getLineNumbers,
     addRecentFolder,
     getRecentFolders,
   } from "./lib/services/persistence";
@@ -69,6 +71,7 @@
   let docsPath = $state("");
   let sortMode: SortMode = $state(getSortMode());
   let layoutMode: LayoutMode = $state(getLayoutMode());
+  let showLineNumbers = $state(getLineNumbers());
   let filterQuery = $state("");
   let searchMode = $state(false);
   let searchQuery = $state("");
@@ -397,6 +400,11 @@
   function handleLayoutChange(mode: LayoutMode) {
     layoutMode = mode;
     saveLayoutMode(mode);
+  }
+
+  function handleLineNumbersChange(enabled: boolean) {
+    showLineNumbers = enabled;
+    saveLineNumbers(enabled);
   }
 
   async function handleHelp() {
@@ -957,7 +965,7 @@
 
 <div class="app-layout">
   <Sidebar entries={tree} {selectedPath} {selectedFolderPath} onselect={(path, event, lineContent) => handleSelect(path, event, lineContent)} onchangefolder={handleChangeFolder} {sortMode} onsortchange={handleSortChange} onhelp={handleHelp} {helpActive} {filterQuery} onfilterchange={handleFilterChange} {searchMode} onsearchmodechange={handleSearchModeChange} {searchResults} {searchQuery} onsearchchange={handleSearchChange} {isSearching} onnewfile={handleNewFile} onnewfolder={handleNewFolder} {creatingFile} {creatingFolder} oncreatenewfile={handleCreateNewFile} oncancelcreate={handleCancelCreate} oncreatenewfolder={handleCreateNewFolder} oncancelcreatefolder={handleCancelCreateFolder} {newFileError} {newFolderError} onfocuschange={handleFocusChange} onfolderselect={handleFolderSelect} onmovefile={handleMoveFile} {renamingPath} {renameError} onstartrename={handleStartRename} onconfirmrename={handleConfirmRename} oncancelrename={handleCancelRename} ondelete={handleDeleteFile} onsaveas={handleSaveAsForPath} {docsPath} {theme} onthemetoggle={handleThemeToggle} oncopypath={handleCopyPath} {loading} />
-  <ContentArea {panes} {activePaneId} {layoutMode} onlayoutchange={handleLayoutChange} onclosepane={handleClosePane} onactivatepane={handleActivatePane} ontoggleedit={handleToggleEdit} onsave={handleSave} onsaveas={handleSaveAsFromPane} {highlightText} {highlightKey} {theme} onfilelink={handleFileLink} {scrollToId} />
+  <ContentArea {panes} {activePaneId} {layoutMode} onlayoutchange={handleLayoutChange} {showLineNumbers} onlinenumberschange={handleLineNumbersChange} onclosepane={handleClosePane} onactivatepane={handleActivatePane} ontoggleedit={handleToggleEdit} onsave={handleSave} onsaveas={handleSaveAsFromPane} {highlightText} {highlightKey} {theme} onfilelink={handleFileLink} {scrollToId} />
 </div>
 
 <style>

@@ -312,4 +312,30 @@ Polar Markdown supports multiple independent windows. To test:
 
 ---
 
+## Source Line Numbers
+
+Click the **1:** button in the header to toggle source line numbers. Each block element should show its source line number in the left gutter:
+
+- This paragraph should show a line number
+- The heading above should show its line number
+- Code blocks, blockquotes, tables, and horizontal rules all get line numbers
+
+> This blockquote should have a line number in the gutter.
+
+| Element | Expected |
+|---------|----------|
+| Heading | Line number matches source |
+| Paragraph | Line number matches source |
+| Code block | Line number matches source |
+
+```python
+# This code block should show a source line number too
+def hello():
+    print("world")
+```
+
+Toggle off — all gutter numbers should disappear.
+
+---
+
 *This file is a rendering museum — every feature of Polar Markdown displayed in one place.*
