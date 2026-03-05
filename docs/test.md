@@ -113,6 +113,17 @@ stateDiagram-v2
     Published --> [*]
 ```
 
+### Intentionally Broken Mermaid (Error Display)
+
+This block has invalid syntax to showcase the error overlay. You should see a red-bordered block with an error message instead of a rendered diagram:
+
+```mermaid
+flowchart INVALID
+    A--->>>B
+    this is not valid mermaid syntax !!!
+    C --> D --> --> E
+```
+
 ---
 
 ## ASCII Art / Svgbob Diagrams

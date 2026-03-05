@@ -218,6 +218,8 @@ graph LR
 
 Supported diagram types include flowcharts, sequence diagrams, class diagrams, state diagrams, ER diagrams, Gantt charts, pie charts, and more. See the [Mermaid documentation](https://mermaid.js.org/) for syntax details.
 
+**Error handling:** If a mermaid block has invalid syntax, Polar Markdown shows a red-bordered error overlay with the specific error message instead of a blank space. The raw mermaid source is kept visible below the error so you can diagnose and fix the problem. A status indicator in the viewer header shows how many diagrams rendered successfully (e.g. "3 diagrams OK" or "1 of 3 diagrams failed").
+
 ---
 
 ## Editing Markdown

@@ -5,6 +5,8 @@ vi.mock("mermaid", () => ({
   default: {
     initialize: vi.fn(),
     run: vi.fn(),
+    parse: vi.fn(),
+    render: vi.fn(),
   },
 }));
 
@@ -18,7 +20,8 @@ vi.mock("@tauri-apps/api/core", () => ({
   convertFileSrc: vi.fn((path: string) => `http://asset.localhost/${path.replace(/\\/g, "/")}`),
 }));
 
-import { renderMarkdown, renderMermaidDiagrams, getDirectory, resolveImageSrc, slugify, resolvePath } from "./markdown";
+import { renderMarkdown, renderMermaidDiagrams, validateMermaidBlocks, getDirectory, resolveImageSrc, slugify, resolvePath } from "./markdown";
+import type { MermaidDiagnostic } from "./markdown";
 import mermaid from "mermaid";
 
 describe("renderMarkdown", () => {
@@ -188,17 +191,19 @@ describe("renderMarkdown tables", () => {
 
 describe("renderMermaidDiagrams", () => {
   beforeEach(() => {
-    vi.mocked(mermaid.run).mockReset();
+    vi.mocked(mermaid.parse).mockReset();
+    vi.mocked(mermaid.render).mockReset();
+    document.body.innerHTML = "";
   });
 
-  it("calls mermaid.run with correct selector", async () => {
-    vi.mocked(mermaid.run).mockResolvedValue(undefined as any);
+  it("returns result with total and errorCount fields", async () => {
+    document.body.innerHTML = '<pre class="mermaid">flowchart TD\n    A-->B</pre>';
+    vi.mocked(mermaid.parse).mockResolvedValue(true as any);
+    vi.mocked(mermaid.render).mockResolvedValue({ svg: '<svg></svg>', bindFunctions: vi.fn() } as any);
 
-    await renderMermaidDiagrams();
-
-    expect(mermaid.run).toHaveBeenCalledWith({
-      querySelector: "pre.mermaid",
-    });
+    const result = await renderMermaidDiagrams();
+    expect(result).toHaveProperty("total");
+    expect(result).toHaveProperty("errorCount");
   });
 });
 
@@ -361,6 +366,117 @@ describe("resolvePath", () => {
   it("preserves leading slash for Unix paths", () => {
     const result = resolvePath("/usr/share/docs", "file.md");
     expect(result.startsWith("/")).toBe(true);
+  });
+});
+
+describe("validateMermaidBlocks", () => {
+  beforeEach(() => {
+    document.body.innerHTML = "";
+    vi.mocked(mermaid.parse).mockReset();
+  });
+
+  it("returns empty array when all blocks are valid", async () => {
+    document.body.innerHTML = '<pre class="mermaid">flowchart TD\n    A-->B</pre>';
+    vi.mocked(mermaid.parse).mockResolvedValue(true as any);
+
+    const diagnostics = await validateMermaidBlocks();
+    expect(diagnostics).toEqual([]);
+  });
+
+  it("returns diagnostics for invalid syntax", async () => {
+    document.body.innerHTML = '<pre class="mermaid">not valid mermaid</pre>';
+    vi.mocked(mermaid.parse).mockRejectedValue(new Error("Parse error on line 1"));
+
+    const diagnostics = await validateMermaidBlocks();
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0].blockIndex).toBe(0);
+    expect(diagnostics[0].error).toContain("Parse error");
+  });
+
+  it("includes error message from mermaid", async () => {
+    document.body.innerHTML = '<pre class="mermaid">graph XY\n  bad syntax</pre>';
+    vi.mocked(mermaid.parse).mockRejectedValue(new Error("Diagram type not found: XY"));
+
+    const diagnostics = await validateMermaidBlocks();
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0].error).toBe("Diagram type not found: XY");
+  });
+
+  it("handles multiple blocks (some valid, some not)", async () => {
+    document.body.innerHTML =
+      '<pre class="mermaid">flowchart TD\n    A-->B</pre>' +
+      '<pre class="mermaid">invalid stuff</pre>' +
+      '<pre class="mermaid">sequenceDiagram\n    A->>B: Hi</pre>';
+    vi.mocked(mermaid.parse)
+      .mockResolvedValueOnce(true as any)
+      .mockRejectedValueOnce(new Error("Parse error"))
+      .mockResolvedValueOnce(true as any);
+
+    const diagnostics = await validateMermaidBlocks();
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0].blockIndex).toBe(1);
+  });
+
+  it("handles empty blocks gracefully", async () => {
+    document.body.innerHTML = '<pre class="mermaid"></pre>';
+    vi.mocked(mermaid.parse).mockRejectedValue(new Error("No diagram definition"));
+
+    const diagnostics = await validateMermaidBlocks();
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0].blockIndex).toBe(0);
+  });
+});
+
+describe("renderMermaidDiagrams per-block error handling", () => {
+  beforeEach(() => {
+    document.body.innerHTML = "";
+    vi.mocked(mermaid.parse).mockReset();
+    vi.mocked(mermaid.render).mockReset();
+  });
+
+  it("injects error overlay on invalid blocks", async () => {
+    document.body.innerHTML = '<pre class="mermaid">bad diagram</pre>';
+    vi.mocked(mermaid.parse).mockRejectedValue(new Error("Parse error on line 1"));
+
+    const result = await renderMermaidDiagrams();
+
+    const errorDiv = document.querySelector(".mermaid-error");
+    expect(errorDiv).not.toBeNull();
+    expect(errorDiv!.textContent).toContain("Parse error");
+  });
+
+  it("renders valid blocks normally", async () => {
+    document.body.innerHTML = '<pre class="mermaid">flowchart TD\n    A-->B</pre>';
+    vi.mocked(mermaid.parse).mockResolvedValue(true as any);
+    vi.mocked(mermaid.render).mockResolvedValue({ svg: '<svg>rendered</svg>', bindFunctions: vi.fn() } as any);
+
+    const result = await renderMermaidDiagrams();
+
+    const pre = document.querySelector("pre.mermaid");
+    expect(pre!.innerHTML).toContain("<svg>rendered</svg>");
+    expect(document.querySelector(".mermaid-error")).toBeNull();
+  });
+
+  it("returns result with total and errorCount", async () => {
+    document.body.innerHTML =
+      '<pre class="mermaid">flowchart TD\n    A-->B</pre>' +
+      '<pre class="mermaid">bad</pre>';
+    vi.mocked(mermaid.parse)
+      .mockResolvedValueOnce(true as any)
+      .mockRejectedValueOnce(new Error("Parse error"));
+    vi.mocked(mermaid.render).mockResolvedValue({ svg: '<svg></svg>', bindFunctions: vi.fn() } as any);
+
+    const result = await renderMermaidDiagrams();
+    expect(result.total).toBe(2);
+    expect(result.errorCount).toBe(1);
+  });
+
+  it("returns zero counts when no mermaid blocks exist", async () => {
+    document.body.innerHTML = '<p>No diagrams here</p>';
+
+    const result = await renderMermaidDiagrams();
+    expect(result.total).toBe(0);
+    expect(result.errorCount).toBe(0);
   });
 });
 

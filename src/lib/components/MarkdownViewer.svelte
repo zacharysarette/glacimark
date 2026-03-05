@@ -1,6 +1,7 @@
 <script lang="ts">
   import { tick } from "svelte";
   import { renderMarkdown, renderMermaidDiagrams, renderBobDiagrams, getDirectory, resolvePath } from "../services/markdown";
+  import type { MermaidRenderResult } from "../services/markdown";
   import { open } from "@tauri-apps/plugin-shell";
   import { extractDiagramLabels, getCodeBlockLineOverlayPosition, stripMarkdownSyntax, findMatchingBlockElement, findMatchingPreElement, clearBlockHighlights, getTableCellIndex, clearLineHeightCache } from "../services/highlight";
   import type { LayoutMode } from "../types";
@@ -38,6 +39,7 @@
   let htmlContent = $state("");
   let articleEl: HTMLElement | undefined = $state();
   let contentReady = $state(0);
+  let mermaidStatus: MermaidRenderResult | null = $state(null);
   let contentReadyTimer: ReturnType<typeof setTimeout> | undefined;
   let diagramDebounceTimer: ReturnType<typeof setTimeout> | undefined;
   // Cached block elements for active line highlight (invalidated when htmlContent changes)
@@ -71,11 +73,15 @@
   // After HTML updates, render any mermaid and svgbob diagrams (debounced at 1000ms)
   $effect(() => {
     if (htmlContent) {
+      mermaidStatus = null;
       if (diagramDebounceTimer) clearTimeout(diagramDebounceTimer);
       diagramDebounceTimer = setTimeout(() => {
         requestAnimationFrame(async () => {
-          try { await renderMermaidDiagrams(); } catch {
-            // Mermaid errors are non-fatal (e.g. invalid diagram syntax)
+          try {
+            const result = await renderMermaidDiagrams();
+            mermaidStatus = result.total > 0 ? result : null;
+          } catch {
+            // Mermaid errors are non-fatal
           }
           try { await renderBobDiagrams(); } catch {
             // Bob diagram errors are non-fatal
@@ -447,6 +453,15 @@
     {#if showHeader}
       <header class="viewer-header">
         <span class="file-name" title={filePath}>{fileName}</span>
+        {#if mermaidStatus}
+          <span class="mermaid-status" class:has-errors={mermaidStatus.errorCount > 0}>
+            {#if mermaidStatus.errorCount > 0}
+              {mermaidStatus.errorCount} of {mermaidStatus.total} diagram{mermaidStatus.total === 1 ? '' : 's'} failed
+            {:else}
+              {mermaidStatus.total} diagram{mermaidStatus.total === 1 ? '' : 's'} OK
+            {/if}
+          </span>
+        {/if}
         <div class="layout-controls">
           <button class:active={layoutMode === "centered"} onclick={() => onlayoutchange?.("centered")} title="Single column">&#x2261;</button>
           <button class:active={layoutMode === "columns"} onclick={() => onlayoutchange?.("columns")} title="Multi-column">&#x229E;</button>
@@ -486,6 +501,19 @@
     font-size: 13px;
     color: var(--accent);
     font-weight: 500;
+  }
+
+  .mermaid-status {
+    font-size: 11px;
+    color: var(--green);
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--green-hover);
+  }
+
+  .mermaid-status.has-errors {
+    color: var(--red);
+    background: var(--red-hover);
   }
 
   .layout-controls {
