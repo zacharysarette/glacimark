@@ -4,16 +4,16 @@
 
 Desktop markdown editor built with **Tauri 2.10 + Svelte 5 + TypeScript**. Has a split-pane CodeMirror editor with live preview, native folder selector, file watching, keyboard navigation, Mermaid diagram rendering, scroll sync, active line highlighting, state persistence via localStorage, OS file associations for `.md` files, CLI support (`glacimark file.md`), single-instance handling, dual theming (Aurora/Glacier), drag-and-drop file organization, anchor/file link navigation, source line numbers, editor mermaid linting, and bundle code splitting with lazy-loaded dependencies.
 
-### Current Version: 0.0.6
+### Current Version: 0.1.3
 
-### Current Test Count: 560 frontend (18 test files) + 107 Rust = 667 total
+### Current Test Count: 641 frontend (23 test files) + 118 Rust = 759 total
 
 ### Key Files
 - **Rust backend:** `src-tauri/src/` — `lib.rs`, `models.rs`, `commands/{mod,filesystem,watcher,diagram,jumplist}.rs`
-- **Frontend:** `src/App.svelte` (root), `src/lib/components/` (Sidebar, FileTree, FileTreeItem, MarkdownViewer, ContentArea, EditablePane, MarkdownEditor, SearchResults, Toast, TableOfContents), `src/lib/services/` (filesystem, persistence, markdown, tree-utils, sort, highlight, codemirror-themes, mermaid-linter, mermaid-fixer, undo, toc), `src/lib/types.ts`
+- **Frontend:** `src/App.svelte` (root), `src/lib/components/` (Sidebar, FileTree, FileTreeItem, MarkdownViewer, ContentArea, EditablePane, MarkdownEditor, SearchResults, Toast, TableOfContents, Backlinks, TocPane, DocStats), `src/lib/services/` (filesystem, persistence, markdown, tree-utils, sort, highlight, codemirror-themes, mermaid-linter, mermaid-fixer, undo, toc, doc-stats, image-paste), `src/lib/types.ts`
 - **Config:** `tauri.conf.json`, `vitest.config.ts`, `vite.config.ts`, `src-tauri/Cargo.toml`, `src-tauri/capabilities/default.json`
 - **Installer:** `src-tauri/windows/installer-hooks.nsh`
-- **Tests:** 18 `.test.ts` files in `src/lib/`, Rust tests in `lib.rs` + `commands/{filesystem,diagram}.rs`
+- **Tests:** 23 `.test.ts` files in `src/lib/`, Rust tests in `lib.rs` + `commands/{filesystem,diagram,jumplist}.rs`
 
 ---
 
@@ -54,6 +54,20 @@ All shipped and tested:
 31. **Zoom** — Ctrl+=/−/0 and Ctrl+wheel, 50%–200% range, persisted, affects viewer + editor text only
 32. **Table of Contents** — Ctrl+T sidebar panel, auto-generated from headings, active heading tracking via IntersectionObserver, persisted visibility
 33. **Windows Jump List** — COM API for recent folders in taskbar right-click menu, `--open-folder` args, single-instance support
+34. **Find & Replace Theming** — `@codemirror/search` styled for both Aurora and Glacier themes
+35. **Wiki-style Links** — `[[filename]]` and `[[filename|alias]]` syntax with purple dashed underline styling
+36. **Backlinks** — collapsible footer panel showing which files link to the current file via wiki-links
+37. **Document Statistics** — Ctrl+I footer bar with word count, reading time, Flesch Reading Ease, FK Grade
+38. **Image Paste/Drop** — Ctrl+V or drag-drop images into editor, auto-saved to `assets/` subfolder with markdown reference insertion
+39. **Copy Path** — right-click context menu to copy full file/folder path to clipboard
+40. **Multiple Windows** — Ctrl+Shift+N for independent windows, each with own sidebar/folder/panes
+
+---
+
+## Known Bugs
+
+- **#23 — File tree does not refresh on new file creation** — When new files are created and updated, the file tree does not always refresh to show the new file. ([GitHub Issue](https://github.com/zacharysarette/glacimark/issues/23))
+- **#30 — Highlights in Editor don't always match on the viewer** — Search highlights in the editor sometimes don't correspond to the correct position in the viewer preview. ([GitHub Issue](https://github.com/zacharysarette/glacimark/issues/30))
 
 ---
 
@@ -99,9 +113,7 @@ Standalone Node.js MCP server (`mcp-server/` directory) using `@modelcontextprot
 - **Markdown toolbar** — bold, italic, heading, link buttons above editor
 - **Vim/Emacs keybindings** — CodeMirror 6 extensions
 - **CLI linting script** — `npm run lint:mermaid -- docs/` for CI pipelines
-- **Image paste/drop** — paste images from clipboard, auto-save to disk
 - **Markdown templates** — new file offers template choices (meeting notes, project plan, etc.)
-- **Word count / reading time** — status bar indicator
 - **Highlight.js tree-shaking** — selective language imports to cut ~970 KB chunk to ~100-200 KB
 
 ---
