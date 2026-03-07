@@ -100,6 +100,27 @@ describe("fixMermaidBlock", () => {
     expect(result.fixes).toBe(0);
     expect(result.content).toBe("");
   });
+
+  it("fixes single-dash arrows with \\r\\n line endings", () => {
+    const input = "graph TD\r\n  A -> B";
+    const result = fixMermaidBlock(input);
+    expect(result.fixes).toBe(1);
+    expect(result.content).toContain("-->");
+  });
+
+  it("adds direction to bare graph with \\r\\n line endings", () => {
+    const input = "graph\r\n  A --> B";
+    const result = fixMermaidBlock(input);
+    expect(result.content).toMatch(/^graph TD/);
+    expect(result.fixes).toBe(1);
+  });
+
+  it("appends end for unclosed subgraph with \\r\\n line endings", () => {
+    const input = "graph TD\r\n  subgraph SG\r\n    A --> B";
+    const result = fixMermaidBlock(input);
+    expect(result.content).toContain("end");
+    expect(result.fixes).toBe(1);
+  });
 });
 
 describe("fixMermaidInMarkdown", () => {
@@ -139,5 +160,29 @@ describe("fixMermaidInMarkdown", () => {
     const result = fixMermaidInMarkdown(md);
     expect(result.totalFixes).toBe(0);
     expect(result.result).toBe(md);
+  });
+
+  it("matches and fixes mermaid blocks with \\r\\n line endings", () => {
+    const md = "```mermaid\r\nA -> B\r\n```";
+    const result = fixMermaidInMarkdown(md);
+    expect(result.totalFixes).toBeGreaterThan(0);
+    expect(result.result).toContain("graph TD");
+    expect(result.result).toContain("-->");
+  });
+
+  it("fixes multiple mermaid blocks with \\r\\n line endings", () => {
+    const md = "```mermaid\r\nA -> B\r\n```\r\n\r\n```mermaid\r\nC -> D\r\n```";
+    const result = fixMermaidInMarkdown(md);
+    expect(result.totalFixes).toBeGreaterThan(0);
+    const arrows = result.result.match(/-->/g);
+    expect(arrows!.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("handles mixed \\r\\n and \\n line endings", () => {
+    const md = "```mermaid\r\nA -> B\n```\n\n```mermaid\nC -> D\r\n```";
+    const result = fixMermaidInMarkdown(md);
+    expect(result.totalFixes).toBeGreaterThan(0);
+    const arrows = result.result.match(/-->/g);
+    expect(arrows!.length).toBeGreaterThanOrEqual(2);
   });
 });

@@ -31,7 +31,7 @@ const NON_GRAPH_TYPES = [
 export function fixMermaidBlock(text: string): FixResult {
   if (!text.trim()) return { content: text, fixes: 0 };
 
-  let content = text;
+  let content = text.replace(/\r\n/g, "\n");
   let fixes = 0;
 
   const firstLine = content.split("\n")[0].trim();
@@ -87,8 +87,9 @@ export function fixMermaidBlock(text: string): FixResult {
 
 export function fixMermaidInMarkdown(markdown: string): MarkdownFixResult {
   let totalFixes = 0;
+  const normalized = markdown.replace(/\r\n/g, "\n");
 
-  const result = markdown.replace(/```mermaid\n([\s\S]*?)```/g, (_match, block: string) => {
+  const result = normalized.replace(/```mermaid\n([\s\S]*?)```/g, (_match, block: string) => {
     const fixed = fixMermaidBlock(block.trimEnd());
     totalFixes += fixed.fixes;
     return "```mermaid\n" + fixed.content + "\n```";
